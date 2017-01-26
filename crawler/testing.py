@@ -5,6 +5,4 @@ import re
 import requests
 import bs4
 
-print "testing here and there"
-print "haha"
-print "lala"
+print "testing"
