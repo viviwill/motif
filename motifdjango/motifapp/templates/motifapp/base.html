@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}Motif{% endblock %}</title>
+    <meta charset="UTF-8">
+
+    {% load staticfiles %}
+    <!-- Bootstrap -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- logl -->
+            <div class="navbar-header">
+                <a href="{% url 'motifapp:index' %}" class="navbar-brand">MOTIF</a>
+                <button type="botton" class="navbar-toggle" data-toggle="collapse" data-target="#mainNavBar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+
+            <div class="collapse navbar-collapse" id="mainNavBar">
+                <!-- left side button and logo -->
+                <ul class="nav navbar-nav">
+                    <li><a href="#">button1</a></li>
+                    <li><a href="#">button2</a></li>
+                    <li><a href="#">button3</a></li>
+                </ul>
+
+                <!-- right side button and logo -->
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">User <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">User Profile</a></li>
+                            <li><a href="#">Setting</a></li>
+                            <li><a href="{% url 'motifapp:logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+
+
+                <!-- add article -->
+                <form class="navbar-form navbar-right" role="form" method="post"
+                      action="{% url 'motifapp:article_add' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="col-sm-10">
+                            <input id="article_url" name="web_url" type="text">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-default"> + </button>
+                </form>
+            </div>
+
+        </div>
+    </nav>
+{% block body %}
+{% endblock %}
+</body>
+</html>

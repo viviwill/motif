@@ -1,0 +1,20 @@
+{% extends 'motifapp/base.html' %}
+
+{% block body %}
+<div class ="container-fluid">
+    <h1> This is the register form </h1>
+    <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% include 'motifapp/form_template.html' %}
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-success">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="panel-footer">
+    Already have an account? <a href="{% url 'motifapp:login' %}">Click here</a> to login.
+</div>
+
+{% endblock %}

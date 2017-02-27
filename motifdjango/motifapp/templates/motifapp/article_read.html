@@ -1,0 +1,36 @@
+{% extends 'motifapp/base.html' %}
+
+{% block body %}
+<div class="container">
+    <div class="article-header">
+        <h1 class="article-title">{{ article.title }} </h1>
+        <p class="source-description">
+            From: {{ article.domain }}
+        </p>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-8 article-main">
+            <div class="article-content">
+                {{ article.body_content|safe }}
+            </div>
+        </div>
+
+        <div class="col-sm-4 article-side">
+            <p>Summary here</p>
+            <form role="form" method="post"
+                  action="{% url 'motifapp:summary_add' article.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <input id="summary" name="summary" type="text">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-default"> Submit </button>
+            </form>
+        </div>
+    </div>
+
+
+</div>
+{% endblock %}
