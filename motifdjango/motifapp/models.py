@@ -34,6 +34,9 @@ class Storage(models.Model):
     rating_i = models.IntegerField(blank=True, null=True)
     summary = models.CharField(max_length=2000, blank=True, null=True)
 
+    summary_modified_date = models.DateTimeField('summary modified', null=True)
+    ratings_modified_date = models.DateTimeField('ratings modified', null=True)
+
     def __str__(self):
         return '%s' % (self.article)
 

@@ -40,25 +40,76 @@ class IndexView(generic.ListView):
 
         # user saved article list
         article_list = Article.objects.filter(storage__user=user.id).order_by('-add_date')
-        context['user_saved_article'] = article_list.values('id', 'title', 'storage__add_date')
-
+        context['user_saved_article'] = article_list.values('id', 'title', 'body_content',
+                                                            'storage__add_date')
         # context['saved_list'] = Article.objects.annotate(number_of_entries=Count('storage')).order_by('-number_of_entries')
         return context
 
 
-# individual article detailed view
+# individual article display view
 def article_read(request, article_id):
     user = request.user
+    storage_entry = Storage.objects.filter(user_id=user).get(article_id=article_id)
     article = get_object_or_404(Article, pk=article_id)
-    return render(request, 'motifapp/article_read.html', {'article': article, 'user': user})
+    return render(request, 'motifapp/article_read.html',
+                  {'article': article,
+                   'user': user,
+                   'storage_entry': storage_entry,
+                   'reading_time': article.word_count/200,
+                   })
 
 
 # add summary
-def summary_add(request, article_id):
+def summary_edit(request, article_id):
     article = get_object_or_404(Article, pk=article_id)
-    if request.method == "POST":
-        print "Post is here:", request.POST['summary']
+
+    # if it's POST and summary not empty, then perform POST
+    # otherwise go to edit page
+    if request.method == "POST" and request.POST['summary'].strip():
+        summary = request.POST['summary']
         # you need to render the same thing as def article_read, to show the info on same page
+        user_storage = Storage.objects.filter(user_id=request.user).get(article_id=article_id)
+        # upload the summary and mod_date, then save
+        user_storage.summary = summary
+        user_storage.summary_modified_date = timezone.now()
+        user_storage.save()
+
+        # once finish editing, go back to article page
+        return redirect('motifapp:article_read', article_id)
+    else:
+        user = request.user
+        summary = Storage.objects.filter(user_id=user).get(article_id=article_id).summary
+        article = get_object_or_404(Article, pk=article_id)
+        return render(request, 'motifapp/article_edit.html',
+                      {'article': article, 'user': user, 'summary': summary})
+
+
+# delete summary
+def summary_delete(request, article_id):
+    user_storage = Storage.objects.filter(user_id=request.user).get(article_id=article_id)
+    # upload the summary and mod_date, then save
+    user_storage.summary = None
+    user_storage.summary_modified_date = None
+    user_storage.save()
+
+    # redirect to individual article page
+    return redirect('motifapp:article_read', article_id)
+
+
+def rating_creative_edit(request, article_id):
+    if request.method == "POST":
+        user_storage = Storage.objects.filter(user_id=request.user).get(article_id=article_id)
+        c_rating = request.POST.get('creative-star')
+        i_rating = request.POST.get('informative-star')
+        print "POST creative rating: ", c_rating
+        print "POST informative rating: ", i_rating
+
+        # update the score
+        if c_rating is not None:
+            user_storage.rating_c = c_rating
+        if i_rating is not None:
+            user_storage.rating_i = i_rating
+        user_storage.save()
         return redirect('motifapp:article_read', article_id)
 
 

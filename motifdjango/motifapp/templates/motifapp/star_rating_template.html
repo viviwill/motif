@@ -1,0 +1,54 @@
+<!-- Modal -->
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Modal Header</h4>
+            </div>
+            <div class="modal-body">
+                <div class="creative-star-rating">
+                    <form role ="form" method="post" action="{% url 'motifapp:rating_creative_edit' article.id %}" enctype="multipart/form-data">{% csrf_token %}
+                        <div class="col-md-8">
+                            <input class="star creative-star-5" id="creative-star-5" type="radio" value="5" name="creative-star"/>
+                            <label class="star creative-star-5" for="creative-star-5"></label>
+                            <input class="star creative-star-4" id="creative-star-4" type="radio" value="4" name="creative-star"/>
+                            <label class="star creative-star-4" for="creative-star-4"></label>
+                            <input class="star creative-star-3" id="creative-star-3" type="radio" value="3" name="creative-star"/>
+                            <label class="star creative-star-3" for="creative-star-3"></label>
+                            <input class="star creative-star-2" id="creative-star-2" type="radio" value="2" name="creative-star"/>
+                            <label class="star creative-star-2" for="creative-star-2"></label>
+                            <input class="star creative-star-1" id="creative-star-1" type="radio" value="1" name="creative-star"/>
+                            <label class="star creative-star-1" for="creative-star-1"></label>
+                        </div>
+                        <div class="col-md-4">
+                        </div>
+                </div>
+                <div class="informative-star-rating">
+                        <div class="col-md-8">
+                            <input class="star informative-star-5" id="informative-star-5" type="radio" value="5" name="informative-star"/>
+                            <label class="star informative-star-5" for="informative-star-5"></label>
+                            <input class="star informative-star-4" id="informative-star-4" type="radio" value="4" name="informative-star"/>
+                            <label class="star informative-star-4" for="informative-star-4"></label>
+                            <input class="star informative-star-3" id="informative-star-3" type="radio" value="3" name="informative-star"/>
+                            <label class="star informative-star-3" for="informative-star-3"></label>
+                            <input class="star informative-star-2" id="informative-star-2" type="radio" value="2" name="informative-star"/>
+                            <label class="star informative-star-2" for="informative-star-2"></label>
+                            <input class="star informative-star-1" id="informative-star-1" type="radio" value="1" name="informative-star"/>
+                            <label class="star informative-star-1" for="informative-star-1"></label>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary"> rate </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+
