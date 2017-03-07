@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from django.views import generic
+from django.views.generic.edit import FormMixin
 from django.views.generic import View
 from django.db.models import Count
 
@@ -203,19 +204,59 @@ def logout_user(request):
     return render(request, 'motifapp/login.html', context)
 
 
-# user profile
-# class UserProfile(generic.DetailView):
-#     model = User
-#     slug_field = "username"
-#     template_name = "motifapp/user_profile.html"
-
-
-class UserProfile(generic.DetailView):
+class UserProfile(generic.DetailView, FormMixin):
     model = User
     slug_field = "username"
     template_name = "motifapp/user_profile.html"
+    form_class = ProfileForm
 
     def get_context_data(self, **kwargs):
         context = super(UserProfile, self).get_context_data(**kwargs)
-        context['form'] = ProfileForm
+        context['form'] = ProfileForm(initial={'username': self.request.user})
         return context
+
+    def post(self, request, *args, **kwargs):
+        # get the posted form, then validate
+        form = self.form_class(request.POST)
+
+        if form.is_valid():
+            user = form.save(commit=False)
+            # cleaned (normalized) data
+            username = form.cleaned_data['username']
+            old_password = form.cleaned_data['old_password']
+            new_password = form.cleaned_data['new_password']
+            portrait = form.cleaned_data['user_portrait']
+
+            update_profile = SocialProfile.objects.get(user=self.request.user)
+            update_profile.user_portrait = portrait
+
+            # portrait.
+
+
+
+
+        return render(request, self.template_name, {'form': form})
+
+        # if form.is_valid():
+        #     user = form.save(commit=False)
+        #     # cleaned (normalized) data
+        #     username = form.cleaned_data['username']
+        #     password = form.cleaned_data['password']
+        #
+        #     # django built in way to set password
+        #     user.set_password(password)
+        #     user.save()
+        #
+        #     # create a profile after user successfully register
+        #     SocialProfile.objects.get_or_create(user=user)
+        #
+        #     # take user and pw, check db if they exist/active
+        #     user = authenticate(username=username, password=password)
+        #     if user is not None:
+        #         if user.is_active:
+        #             login(request, user)
+        #             return redirect('motifapp:index')
+        #
+        # # if user didn't login, here is the form to try again
+        # return render(request, self.templates_name, {'form': form})
+

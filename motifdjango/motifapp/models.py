@@ -45,7 +45,7 @@ class Storage(models.Model):
 # User following model
 class SocialProfile(models.Model):
     user = models.OneToOneField(User, unique=True)
-    user_portrait = models.FileField(blank=True)
+    user_portrait = models.ImageField(blank=True, upload_to='images/portrait')
     follows = models.ManyToManyField('self', related_name='followed_by', symmetrical=False)
 
     def __str__(self):
