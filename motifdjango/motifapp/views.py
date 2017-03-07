@@ -9,8 +9,8 @@ from django.views.generic import View
 from django.db.models import Count
 
 # ------------
-from .forms import UserForm
-from .models import Article, Storage
+from .forms import *
+from .models import *
 
 # ------------
 import sys
@@ -40,11 +40,14 @@ class IndexView(generic.ListView):
 
         # user saved article list
         article_list = Article.objects.filter(storage__user=user.id).order_by('-add_date')
-        context['user_saved_article'] = article_list.values('id', 'title', 'body_content',
-                                                            'storage__add_date')
+        article_list = Article.objects.filter(storage__user=user.id).order_by('-add_date')
+        context['user_saved_article'] = article_list.values('id', 'title', 'lead_image_url',
+                                                            'storage__add_date', 'storage__summary',
+                                                            'storage__summary_modified_date',
+                                                            'storage__rating_i',
+                                                            'storage__rating_c')
         # context['saved_list'] = Article.objects.annotate(number_of_entries=Count('storage')).order_by('-number_of_entries')
         return context
-
 
 # individual article display view
 def article_read(request, article_id):
@@ -55,7 +58,7 @@ def article_read(request, article_id):
                   {'article': article,
                    'user': user,
                    'storage_entry': storage_entry,
-                   'reading_time': article.word_count/200,
+                   'reading_time': article.word_count / 200,
                    })
 
 
@@ -80,7 +83,7 @@ def summary_edit(request, article_id):
         user = request.user
         summary = Storage.objects.filter(user_id=user).get(article_id=article_id).summary
         article = get_object_or_404(Article, pk=article_id)
-        return render(request, 'motifapp/article_edit.html',
+        return render(request, 'motifapp/summary_edit.html',
                       {'article': article, 'user': user, 'summary': summary})
 
 
@@ -96,7 +99,7 @@ def summary_delete(request, article_id):
     return redirect('motifapp:article_read', article_id)
 
 
-def rating_creative_edit(request, article_id):
+def rating_edit(request, article_id):
     if request.method == "POST":
         user_storage = Storage.objects.filter(user_id=request.user).get(article_id=article_id)
         c_rating = request.POST.get('creative-star')
@@ -152,6 +155,9 @@ class UserFormView(View):
             user.set_password(password)
             user.save()
 
+            # create a profile after user successfully register
+            SocialProfile.objects.get_or_create(user=user)
+
             # take user and pw, check db if they exist/active
             user = authenticate(username=username, password=password)
             if user is not None:
@@ -195,3 +201,21 @@ def logout_user(request):
         'form': form,
     }
     return render(request, 'motifapp/login.html', context)
+
+
+# user profile
+# class UserProfile(generic.DetailView):
+#     model = User
+#     slug_field = "username"
+#     template_name = "motifapp/user_profile.html"
+
+
+class UserProfile(generic.DetailView):
+    model = User
+    slug_field = "username"
+    template_name = "motifapp/user_profile.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(UserProfile, self).get_context_data(**kwargs)
+        context['form'] = ProfileForm
+        return context

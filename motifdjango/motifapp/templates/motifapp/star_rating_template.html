@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
                 <div class="creative-star-rating">
-                    <form role ="form" method="post" action="{% url 'motifapp:rating_creative_edit' article.id %}" enctype="multipart/form-data">{% csrf_token %}
+                    <form role ="form" method="post" action="{% url 'motifapp:rating_edit' article.id %}" enctype="multipart/form-data">{% csrf_token %}
                         <div class="col-md-8">
                             <input class="star creative-star-5" id="creative-star-5" type="radio" value="5" name="creative-star"/>
                             <label class="star creative-star-5" for="creative-star-5"></label>

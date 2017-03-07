@@ -2,15 +2,54 @@
 
 {% block body %}
 <div class="container-fluid">
-    {% for article in user_saved_article %}
-    <div class="col-6 col-lg-4">
-        <h3>{{ article.title }}</h3>
-        <p> {{ article.body_content|truncatewords:20|safe }}</p>
-        <p> added on:{{ article.storage__add_date}} </p>
-        <p><a class="btn btn-secondary" href="{% url 'motifapp:article_read' article.id %}"
-              role="button">View details &raquo;</a></p>
-    </div><!--/span-->
-    {% endfor %}
+    <div class="row">
+        <div class="col-lg-12 ">
+            <div class="search-tool"></div>
+
+            <!-- article thumbnails -->
+            {% for article in user_saved_article %}
+            <div class="col-md-3 col-sm-6">
+                <div class="hovereffect">
+                    <div class="article-thumb">
+                        <a href="{{ article.id }}">
+                            <div class="item-image">
+                                <img src="{{ article.lead_image_url }}" class="img-responsive">
+                            </div>
+                        </a>
+                        <div class="item-content">
+                            <div class="item-text">
+                                <h4 class="thumb-title">{{ article.title }}</h4>
+                                {% if article.storage__rating_i is not None %}
+                                    <p>  &nbsp
+                                        <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
+                                        {{ article.storage__rating_c }}  &nbsp
+                                        <i class="fa fa-book" aria-hidden="true"></i>
+                                        {{ article.storage__rating_i }}
+                                    </p>
+                                {% else %}
+                                <p style=" color: transparent">.</p>
+                                {% endif %}
+
+                                {% if article.storage__summary is None %}
+                                    <p><i>Saved on: {{ article.storage__add_date|date:'N j, o' }}</i></p>
+                                {% else %}
+                                <p class= "summary-date"><i><span>Summed on: {{ article.storage__summary_modified_date|date:'N j, o' }}</span></i></p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 overlay">
+                        <p class="hover-text">{{ article.storage__summary|truncatewords:50 }}...</p>
+                        <p class="hover-link">
+                            <a href="{{ article.id }}">Read Article</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <!-- end article thumbnails -->
+        </div>
+    </div>
 </div>
 {% endblock %}
 

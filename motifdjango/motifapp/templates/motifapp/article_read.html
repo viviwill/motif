@@ -5,7 +5,7 @@
     <div class="article-header col-md-8">
         <h1 class="article-title">{{ article.title }} </h1>
         <p class="source-description">
-            From: {{ article.domain }}
+            <a href="{{ article.web_url }}" target="_blank">{{ article.domain }}</a>
         </p>
 
         <div class="article-main">
@@ -51,7 +51,7 @@
         <!-- user's own summary -->
         <div class="user-summary">
             <div class="time-cost">
-            <h3>Cost: {{ reading_time }} Minutes <a href="#" data-toggle="tooltip" title="Average readers reach around 200 words per minute with a typical comprehension of 60%."><span class="glyphicon glyphicon-question-sign"></span></a></h3>
+            <h3>{{ reading_time }} mins read <a href="#" data-toggle="tooltip" title="Average readers reach around 200 words per minute with a typical comprehension of 60%."><span class="glyphicon glyphicon-question-sign"></span></a></h3>
             </div>
             {% if storage_entry.summary %}
             <p>Your Summary: {{ storage_entry.summary }}</p>

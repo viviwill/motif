@@ -1,0 +1,226 @@
+:root {
+    --main-color: #99bfe5;
+}
+
+body {
+    padding-top: 70px;
+    background-color: #f5f5f5;
+}
+
+.navbar-custom {
+    background-color: white;
+    background-image: none;
+    border-color: var(--main-color);
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: var(--main-color);
+    font-size: large;
+    /*font-weight: bold;*/
+}
+
+.navbar-default .navbar-header a {
+    color: var(--main-color);
+    font-size: 200%;
+    font-weight: bold;
+    letter-spacing: 2px;
+    font-family: Consolas;
+}
+
+/* use this to change the padding between homepage article thumbnail */
+.col-md-3 {
+    padding-right: 7px;
+    padding-left: 7px;
+}
+
+/* ===== index(user homepage) styling =====*/
+
+
+/* thumbnail style*/
+.item-image {
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 50%;
+}
+
+.item-image img {
+    /*height: auto;*/
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.item-content {
+    padding: 1px 15px 15px;
+    background: white;
+}
+
+.item-text {
+    position: relative;
+    height: 100px;
+}
+
+.article-thumb {
+    padding-bottom: 20px;
+}
+
+.thumb-title {
+    /*height: 60%;*/
+}
+
+/* --- thumb minor details ... */
+.summary-date span{
+    position: absolute;
+    margin-left: -18px;
+    color: white;
+    background-color: var(--main-color);
+    padding: 3px 5px 2px;
+
+}
+
+
+/* end of thumbnail style */
+
+
+/* start of homepage hover effect */
+.hovereffect {
+    position: relative;
+}
+
+.image {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: calc(100% - 20px);
+    width: 100%;
+    opacity: 0;
+    transition: .5s ease;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.hovereffect:hover .overlay {
+    opacity: 1;
+}
+
+.hover-text {
+    color: white;
+    font-size: 15px;
+    padding: 18px 15px 10px;
+    top: 30%;
+    left: 20%;
+}
+
+.hover-link, .hover-link a{
+    color: white;
+    text-align: center;
+}
+/* end of home page hover effect */
+/* ===== end of index styling ===== */
+
+/* ===== article styling ===== */
+.article-inline-image {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.navbar-brand {
+    padding-left: 50px;
+}
+
+.sidebar-nav-fixed {
+    width: 27%;
+}
+
+.article-body-content {
+    font-size: large;
+}
+
+.user-rating, .overall-rating {
+    font-size: x-large;
+    text-align: center;
+}
+
+.rating-explain {
+    font-size: small;
+    text-align: center;
+}
+
+.time-cost {
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+.rating {
+    padding-top: 30px;
+    padding-bottom: 15px;
+}
+
+.user-summary {
+    border: 2px slategray;
+}
+
+/* end of article styling*/
+
+/* ===== star rating css starts =====*/
+div.stars {
+    width: 150px;
+    display: inline-block;
+}
+
+input.star {
+    display: none;
+}
+
+label.star {
+    float: right;
+    padding: 10px;
+    font-size: 36px;
+    color: #7a7a7a;
+    transition: all .2s;
+}
+
+input.star:checked ~ label.star:before {
+    content: '\f005';
+    color: #FD4;
+    transition: all .25s;
+}
+
+input.star-5:checked ~ label.star:before {
+    color: #FE7;
+    text-shadow: 0 0 20px #952;
+}
+
+input.star-1:checked ~ label.star:before {
+    color: #F62;
+}
+
+label.star:hover {
+    transform: rotate(-360deg) scale(1.1);
+}
+
+label.star:before {
+    content: '\f006';
+    font-family: FontAwesome;
+}
+
+/* star rating end ---------------------*/
+
+
+/* individual article */
+.article-content img {
+    width:100%;
+    padding-bottom: 20px;
+}
+
+/* end of individual article*/

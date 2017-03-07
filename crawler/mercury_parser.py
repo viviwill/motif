@@ -8,7 +8,6 @@ import os
 from datetime import datetime
 
 
-
 class Crawler(object):
     def __init__(self, target_url):
         self.web_url = target_url
@@ -20,6 +19,7 @@ class Crawler(object):
         self.add_date = None
         self.word_count = None
         self.domain = None
+        self.lead_image_url = None
         self.crawl()
 
     def crawl(self):
@@ -38,23 +38,43 @@ class Crawler(object):
         self.add_date = datetime.now().replace(microsecond=0)
         self.word_count = article['word_count']
         self.domain = article['domain']
+        self.lead_image_url = article['lead_image_url']
 
         # get title, content, and author
         self.title = article['title']
         self.parse_content(article['content'])
-        # self.get_author()
+        self.get_author()
 
     def parse_content(self, content):
         soup = bs4.BeautifulSoup(content, "html.parser")
+        # print "==============================================="
         # print soup.prettify()
-        raw_content = soup.find_all('p')
+        print "==============================================="
+        raw_content = soup.find_all(['p', 'img', 'table'])
+        # for row in raw_content:
+        #     print row
+        print "==============================================="
 
-        temp_content = []
         # clean up <p class> and <a class>
-        for p in raw_content:
-            p = re.sub(r'<p(.*?)>', "<p class=\"article-body-content\">", str(p))
-            p = re.sub(r'<a(.*?)href', "<a class=\"article-body-href\" href", str(p))
-            temp_content.append(p)
+        temp_content = []
+        for row in raw_content:
+            if row.name == 'img':
+                try:
+                    img_src = row['src']
+                    img_src = re.sub(r'.jpg(.*)', ".jpg", str(img_src))
+                    img_subtitle = row.text.strip()
+                    new_img_tag = "<img class=\"article-inline-image\" src=\"%s\"> %s</img>" \
+                                  % (img_src, img_subtitle)
+                    row = new_img_tag
+                except KeyError:
+                    pass
+
+            row = re.sub(r'<p(.*?)>', "<p class=\"article-body-content\">", str(row))
+            row = re.sub(r'<a(.*?)href', "<a class=\"article-body-href\" href", str(row))
+
+            # append the new value
+            temp_content.append(row)
+
         self.body_content_list = temp_content
         # self.body_content_string = unicode('\n'.join(temp_content), 'utf-8')
         self.body_content_string = '\n'.join(temp_content)
@@ -65,11 +85,19 @@ class Crawler(object):
         # find h1 and then use 'find_all_next' to find any class with 'author'
         title = soup.find("h1")
         regex = re.compile('.*author.*')
+
         try:
             author_raw = title.find_all_next(attrs={"class": regex})[0].get_text()
-        except AttributeError:
+            print author_raw
+        except (AttributeError, IndexError):
             self.author = None
-            return
+            try:
+                author_raw = title.find_all_next(attrs={"itemprop": regex})[0].get_text()
+                print author_raw
+            except (AttributeError, IndexError):
+                print "Can't find author"
+                self.author = None
+                return
 
         # delete author title and other info / title() switch to Title case
         author = os.linesep.join([s for s in author_raw.splitlines() if s])
@@ -102,8 +130,8 @@ class Crawler(object):
         for p in self.body_content_list:
             print p
 
-    def get_sql_query_upload_list(self):
-        query_value = [self.title, self.author, self.web_url, self.domain,
+    def get_sql_query_list(self):
+        query_value = [self.title, self.author, self.web_url, self.lead_image_url, self.domain,
                        self.body_content_string, self.pub_date, self.add_date, self.word_count]
         # query_value = ','.join(str(row) for row in query_value)
         return query_value

@@ -19,10 +19,12 @@
         <div class="col-md-4">
             <div class="sidebar-nav-fixed pull-right affix">
                 <div class="well">
-                    <form role="form" method="post" action="{% url 'motifapp:summary_edit' article.id %}" enctype="multipart/form-data">
+                    <form role="form" method="post"
+                          action="{% url 'motifapp:summary_edit' article.id %}" enctype="multipart/form-data" >
                         {% csrf_token %}
                         <div class="col-md-12">
-                            <textarea class="form-control col-md-4" rows="10" id="summary" name="summary" type="text">{% if summary %}{{ summary }}{% else %}Summarize here{% endif %}</textarea>
+                            <textarea class="form-control col-md-4" {% if not summary %} placeholder="Summarize here"{% endif %}  rows="10" id="summary" name="summary"
+                                      type="text">{% if summary %}{{ summary }}{% else %}{% endif %}</textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">      Save </button>
                     </form>

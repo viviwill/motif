@@ -83,7 +83,6 @@ class Crawler(object):
         except KeyError:
             pass
 
-
         content = []
         for row in raw_content:
             paragraphs = row.find_all('p')
@@ -96,11 +95,7 @@ class Crawler(object):
             print row
 
 
-# url = 'https://www.nytimes.com/2017/01/13/world/asia/china-internet-addiction-electroshock-therapy.html?hp&action=click&pgtype=Homepage&clickSource=story-heading&module=second-column-region&region=top-news&WT.nav=top-news'
-# url = 'http://www.espn.com/nba/story/_/id/18470135/fran-fraschilla-rankings-world-top-12-basketball-leagues-nba'
-# url = 'https://movie.douban.com/review/8222354/'
-url = 'https://www.nytimes.com/2017/02/16/technology/facebook-mark-zuckerberg-mission-statement.html?rref=collection%2Fsectioncollection%2Ftechnology&action=click&contentCollection=technology&region=rank&module=package&version=highlights&contentPlacement=2&pgtype=sectionfronts'
-url = 'http://www.newyorker.com/business/currency/why-is-snap-calling-itself-a-camera-company?intcid=mod-latest'
+url ='https://www.nytimes.com/interactive/2017/02/28/us/politics/in-their-choice-of-guests-trump-and-congressional-democrats-sent-dueling-messages.html?hp&action=click&pgtype=Homepage&clickSource=story-heading&module=b-lede-package-region&region=top-news&WT.nav=top-news'
 
 article = Crawler(url)
 print "url:", article.url

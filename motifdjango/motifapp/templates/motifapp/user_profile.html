@@ -1,0 +1,36 @@
+{% extends 'motifapp/base.html' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="header" style="border-bottom: 2px solid dimgray">
+                        <h1>{{ user }}</h1>
+                    </div>
+                    <div class="col-md-6" style="border-bottom: 2px solid dimgray">
+                        <h2> {{ user.socialprofile.follows.all.count }} Following</h2>
+                    </div>
+                    <div class="col-md-6" style="border-bottom: 2px solid dimgray">
+                        <h2>{{ user.socialprofile.followed_by.all.count }} Followers</h2>
+                    </div>
+                </div>
+            </div>
+
+            <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% include 'motifapp/form_template.html' %}
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+{% endblock %}
+
+<!--{% for user in user.socialprofile.follows.all %}-->
+<!--<p>{{ user.user.username }}</p>-->
+<!--{% endfor %}-->
