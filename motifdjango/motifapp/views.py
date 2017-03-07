@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.views import generic
 from django.views.generic.edit import FormMixin
 from django.views.generic import View
+from django.conf import settings
 from django.db.models import Count
 
 # ------------
@@ -217,7 +218,7 @@ class UserProfile(generic.DetailView, FormMixin):
 
     def post(self, request, *args, **kwargs):
         # get the posted form, then validate
-        form = self.form_class(request.POST)
+        form = self.form_class(request.POST, request.FILES)
 
         if form.is_valid():
             user = form.save(commit=False)
@@ -226,12 +227,19 @@ class UserProfile(generic.DetailView, FormMixin):
             old_password = form.cleaned_data['old_password']
             new_password = form.cleaned_data['new_password']
             portrait = form.cleaned_data['user_portrait']
+            portrait.name = str(self.request.user.id) + '.png'
+
+            # if the file exist, delete
+            try:
+                path = 'images/portrait'
+                os.remove(os.path.join(settings.MEDIA_ROOT, path, portrait.name))
+            except OSError:
+                pass
+
 
             update_profile = SocialProfile.objects.get(user=self.request.user)
             update_profile.user_portrait = portrait
-
-            # portrait.
-
+            update_profile.save()
 
 
 

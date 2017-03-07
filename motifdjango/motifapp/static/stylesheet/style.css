@@ -224,3 +224,12 @@ label.star:before {
 }
 
 /* end of individual article*/
+
+
+/* profile page*/
+.user-portrait-lg {
+    width: 100px;
+    height: 100px;
+}
+
+/* end of profile page*/

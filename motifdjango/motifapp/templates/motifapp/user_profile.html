@@ -7,6 +7,8 @@
                 <div class="row">
                     <div class="header" style="border-bottom: 2px solid dimgray">
                         <h1>{{ user }}</h1>
+                        <P> HAHA {{MEDIA_URL}}</P>
+                        <img src="/{{MEDIA_URL}}{{ user.socialprofile.user_portrait }}" class="user-portrait-lg">
                     </div>
                     <div class="col-md-6" style="border-bottom: 2px solid dimgray">
                         <h2> {{ user.socialprofile.follows.all.count }} Following</h2>
