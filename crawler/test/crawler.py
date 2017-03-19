@@ -62,8 +62,5 @@ def crawl(url):
         print row
 
 
-# url = 'https://www.nytimes.com/2017/01/13/world/asia/china-internet-addiction-electroshock-therapy.html?hp&action=click&pgtype=Homepage&clickSource=story-heading&module=second-column-region&region=top-news&WT.nav=top-news'
-# url = 'http://www.espn.com/nba/story/_/id/18470135/fran-fraschilla-rankings-world-top-12-basketball-leagues-nba'
-# url = 'https://movie.douban.com/review/8222354/'
-url = 'http://www.newyorker.com/business/currency/why-is-snap-calling-itself-a-camera-company?intcid=mod-latest'
+url = 'https://plus.google.com/+RipRowan/posts/eVeouesvaVX'
 crawl(url)

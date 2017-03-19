@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
-import os
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -32,12 +31,13 @@ class Storage(models.Model):
 
     # todo check this field, see how to use blank and null
     # 2 ratings: creative and informative
-    rating_c = models.IntegerField(blank=True, null=True)
-    rating_i = models.IntegerField(blank=True, null=True)
+    rating_c = models.FloatField(blank=True, null=True)
+    rating_i = models.FloatField(blank=True, null=True)
     summary = models.CharField(max_length=1500, blank=True, null=True)
 
-    summary_modified_date = models.DateTimeField('summary modified', null=True)
-    ratings_modified_date = models.DateTimeField('ratings modified', null=True)
+    summary_modified_date = models.DateTimeField('summary modified', blank=True, null=True)
+    ratings_modified_date = models.DateTimeField('ratings modified', blank=True, null=True)
+    public = models.BooleanField(default=True)
 
     def __str__(self):
         return '%s' % (self.article)
@@ -47,7 +47,10 @@ class Storage(models.Model):
 class SocialProfile(models.Model):
     user = models.OneToOneField(User, unique=True)
     user_portrait = models.ImageField(blank=True, upload_to='images/portrait')
+    user_info = models.TextField(blank=True, null=True)
     follows = models.ManyToManyField('self', related_name='followed_by', symmetrical=False)
+    theme_font_size = models.FloatField(default=1.4)
+    theme_night_theme = models.BooleanField(default=False)
 
     def __str__(self):
         """Return human-readable representation"""

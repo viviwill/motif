@@ -5,17 +5,15 @@
     <meta charset="UTF-8">
 
     {% load staticfiles %}
-    <!-- Bootstrap -->
-    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>-->
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">-->
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">-->
-    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>-->
-
+    {% load motifapp_extra %}
     <!--Bootstrap 4-->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">-->
+    <script src="https://code.jquery.com/jquery-3.2.0.js" integrity="sha256-wPFJNIFlVY49B+CuAIrDr932XSb6Jk3J1M22M3E2ylQ=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script src="{% static 'el-pagination/js/el-pagination.js' %}"></script>
+    <script src= "{% static 'js/masonry.pkgd.min.js' %}"></script>
+
 
 
     <!--font awesome -->
@@ -24,57 +22,65 @@
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'stylesheet/style.css' %}">
 
+    {% load compress %}
+    {% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'stylesheet/main.scss' %}" />
+    {% endcompress %}
+    <link rel="stylesheet" type="text/css" href="{% static 'stylesheet/main.css' %}">
+    <!-- END OF LOAD -->
+
 </head>
 <body>
-    <!-- top nav bar -->
-    <nav class="navbar navbar-default navbar-fixed-top navbar-custom">
-        <div class="container-fluid">
-            <!-- logo -->
-            <div class="navbar-header">
-                <a href="{% url 'motifapp:index' %}" class="navbar-brand">motif</a>
-                <button type="botton" class="navbar-toggle" data-toggle="collapse" data-target="#mainNavBar">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-            </div>
+    <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse navbar-custom">
 
-            <div class="collapse navbar-collapse" id="mainNavBar">
-                <!-- left side button and logo -->
-                <ul class="nav navbar-nav">
-                    <li><a href="#">Discover</a></li>
-                    <li><a href="#">Readers</a></li>
-                </ul>
+        <!-- logo, discover button-->
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="{% url 'motifapp:index' %}">motif</a>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'motifapp:index' %}">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'motifapp:discover' %}">Discover</a>
+                </li>
+                <!--<li class="nav-item">-->
+                    <!--<a class="nav-link" href="#">Reader</a>-->
+                <!--</li>-->
+            </ul>
 
-                <!-- right side button and logo -->
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> {{ user }} <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#">Message</a></li>
-                            <li><a href="/profile/{{ user }}">Profile</a></li>
-                            <li><a href="#">Setting</a></li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="{% url 'motifapp:logout' %}">Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <!-- add article with web_url -->
-                <form class="navbar-form navbar-right" role="form" method="post" value=""  autocomplete="off"
-                      action="{% url 'motifapp:article_add' %}" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <div class="col-sm-10">
-                            <input class="form-control" id="article_url" name="web_url" type="text" placeholder="Add url">
-                        </div>
+            <!-- add article with web_url -->
+            <form class="form-inline mt-2 mt-md-0" role="form" method="post" value=""  autocomplete="off"
+                  action="{% url 'motifapp:article_add' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <div class="col-sm-10">
+                        <input class="form-control" id="article_url" name="web_url" type="text" placeholder="Add url">
                     </div>
-                    <button type="submit" class="btn btn-default"> + </button>
-                </form>
-            </div>
+                </div>
+                <button type="submit" class="btn btn-outline-success my-2 my-sm-0"> + </button>
+            </form>
+
+            <!-- right side button and logo -->
+            <ul class="navbar-nav dropdown-menu-right">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        &nbsp
+                        <img src="{{MEDIA_URL}}{{ request.user.socialprofile.user_portrait }}" class="navbar-portrait rounded-circle" border="1">
+                        {{ request.user }}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                        <a class="dropdown-item" href="#">Message</a>
+                        <a class="dropdown-item" href="/profile/{{ user }}">Profile</a>
+                        <!--<div class="dropdown-divider"></div>-->
+                        <a class="dropdown-item" href="{% url 'motifapp:logout' %}">Logout</a>
+                    </div>
+                </li>
+            </ul>
         </div>
     </nav>
-    <!-- nav bar end -->
 {% block body %}
 {% endblock %}
 </body>

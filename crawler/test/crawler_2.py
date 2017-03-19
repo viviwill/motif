@@ -95,7 +95,7 @@ class Crawler(object):
             print row
 
 
-url ='https://www.nytimes.com/interactive/2017/02/28/us/politics/in-their-choice-of-guests-trump-and-congressional-democrats-sent-dueling-messages.html?hp&action=click&pgtype=Homepage&clickSource=story-heading&module=b-lede-package-region&region=top-news&WT.nav=top-news'
+url ='https://www.forbes.com/sites/jjcolao/2012/11/27/snapchat-the-biggest-no-revenue-mobile-app-since-instagram/#2f3356c57200'
 
 article = Crawler(url)
 print "url:", article.url

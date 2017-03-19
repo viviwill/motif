@@ -33,8 +33,11 @@ class Crawler(object):
         article = json.loads(r)
 
         # clean up time format
-        if article['date_published'] is not None:
+        try:
             self.pub_date = datetime.strptime(article['date_published'], "%Y-%m-%dT%H:%M:%S.000Z")
+        except TypeError:
+            pass
+
         self.add_date = datetime.now().replace(microsecond=0)
         self.word_count = article['word_count']
         self.domain = article['domain']
@@ -135,7 +138,3 @@ class Crawler(object):
                        self.body_content_string, self.pub_date, self.add_date, self.word_count]
         # query_value = ','.join(str(row) for row in query_value)
         return query_value
-
-# url = 'http://cn.nytstyle.com/style/20170221/how-to-live-wisely/?_ga=1.30414655.1698093237.1459196651'
-# Crawler(url).print_article_info()
-# Crawler(url).print_content()

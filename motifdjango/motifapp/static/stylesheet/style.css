@@ -1,89 +1,78 @@
-:root {
-    --main-color: #99bfe5;
+/* ====== general stuff ====== */
+.card {
+    display:inline-block;
 }
 
+:root {
+    --main-slate-color: #686e9f;
+}
+
+/*header nav width*/
 body {
     padding-top: 70px;
     background-color: #f5f5f5;
 }
 
-.navbar-custom {
-    background-color: white;
-    background-image: none;
-    border-color: var(--main-color);
+/* top-navbar */
+img.navbar-portrait {
+    position: relative;
+    height: 25px;
+    overflow: hidden;
 }
 
-.navbar-default .navbar-nav > li > a {
-    color: var(--main-color);
-    font-size: large;
-    /*font-weight: bold;*/
-}
-
-.navbar-default .navbar-header a {
-    color: var(--main-color);
-    font-size: 200%;
-    font-weight: bold;
-    letter-spacing: 2px;
-    font-family: Consolas;
+img.summary-portrait {
+    width: 35px;
+    height: 35px;
+    position: relative;
+    overflow: hidden;
 }
 
 /* use this to change the padding between homepage article thumbnail */
 .col-md-3 {
-    padding-right: 7px;
-    padding-left: 7px;
+    padding-right: 0px;
+    padding-left: 0px;
 }
 
-/* ===== index(user homepage) styling =====*/
-
+/* ====== start of index.html ======*/
 
 /* thumbnail style*/
-.item-image {
-    position: relative;
-    overflow: hidden;
-    padding-bottom: 50%;
+.card {
+    margin-bottom: 15px;
 }
 
-.item-image img {
-    /*height: auto;*/
-    position: absolute;
+.lead-image {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+}
+
+.card-img-top {
+    width: 100%;
+    margin: auto;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    margin: auto;
 }
 
-.item-content {
-    padding: 1px 15px 15px;
-    background: white;
+.title-and-rating {
+    height: 115px;
 }
 
-.item-text {
-    position: relative;
-    height: 100px;
+/* thumb minor details */
+.article-thumb-link, .article-thumb-link:hover {
+    text-decoration: none;
+    color: black;
 }
 
-.article-thumb {
-    padding-bottom: 20px;
-}
-
-.thumb-title {
-    /*height: 60%;*/
-}
-
-/* --- thumb minor details ... */
-.summary-date span{
-    position: absolute;
-    margin-left: -18px;
+.summary-date span {
+    /*position: absolute;*/
+    margin-left: -22px;
     color: white;
-    background-color: var(--main-color);
+    background-color: var(--main-slate-color);
     padding: 3px 5px 2px;
-
 }
-
-
 /* end of thumbnail style */
-
 
 /* start of homepage hover effect */
 .hovereffect {
@@ -121,29 +110,65 @@ body {
     left: 20%;
 }
 
-.hover-link, .hover-link a{
+.hover-link, .hover-link a {
     color: white;
     text-align: center;
 }
 /* end of home page hover effect */
-/* ===== end of index styling ===== */
+/* end of index.html */
 
-/* ===== article styling ===== */
-.article-inline-image {
-    width: 100%;
-    margin: 0 auto;
+
+/* ====== start of article_read.html ======*/
+.article-wrapper {
+    margin: auto;
+    width: 90%;
+}
+
+.toggle-button {
+    transform: rotate(270deg);
+    transform-origin: left top 0;
+    z-index: 1;
+    position: absolute;
+    /*background: var(--main-slate-color);*/
+    font-size: 1.6rem;
+    color: white;
+    left: -35px;
+    top: 100px;
+    padding: 0 10px 0px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.article-title {
+    font-weight: bold;
+}
+
+.article-content {
+    /*font-size:1.4rem;*/
+}
+
+.article-content img {
+    width: 90%;
+    vertical-align: middle;
+    padding-bottom: 20px;
+    padding-left:7%;
+}
+
+.article-read-user-info {
+    z-index: 10;
 }
 
 .navbar-brand {
     padding-left: 50px;
 }
 
-.sidebar-nav-fixed {
-    width: 27%;
+.source-description {
+    padding-bottom: 20px;
 }
 
-.article-body-content {
-    font-size: large;
+
+.sidebar-nav-fixed {
+    width: 27%;
 }
 
 .user-rating, .overall-rating {
@@ -158,7 +183,12 @@ body {
 
 .time-cost {
     text-align: center;
-    padding-bottom: 20px;
+    height: 3rem;
+    border-bottom: black;
+}
+
+.card-footer.time-cost {
+    border: none;
 }
 
 .rating {
@@ -170,9 +200,136 @@ body {
     border: 2px slategray;
 }
 
-/* end of article styling*/
+.user-summary-edit-date {
+    height: 1.5rem;
+}
 
-/* ===== star rating css starts =====*/
+
+
+
+/* leaving summary sidebar Toggle Styles */
+#wrapper {
+    padding-left: 0;
+    -webkit-transition: all 0.2s ease;
+    -moz-transition: all 0.2s ease;
+    -o-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+#wrapper.toggled {
+    padding-right: 500px;
+}
+
+#sidebar-wrapper {
+    z-index: 2;
+    /* fix position is crucial here*/
+    position: fixed;
+    right: 0px;
+    width: 0;
+    height: 100%;
+    margin-left: -500px;
+    /*overflow-y: auto;*/
+    /*background:;*/
+    -webkit-transition: all 0.2s ease;
+    -moz-transition: all 0.2s ease;
+    -o-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+    width: 500px;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    position: absolute;
+    padding: 15px;
+}
+
+#wrapper.toggled #page-content-wrapper {
+    position: absolute;
+    margin-left: -500px;
+}
+
+/* Sidebar Styles */
+.sidebar-nav {
+    position: absolute;
+    top: 0;
+    width: 500px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sidebar-nav li {
+    text-indent: 20px;
+    line-height: 40px;
+}
+
+.sidebar-nav li a {
+    display: block;
+    text-decoration: none;
+    color: #999999;
+}
+
+.sidebar-nav li a:hover {
+    text-decoration: none;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-nav li a:active,
+.sidebar-nav li a:focus {
+    text-decoration: none;
+}
+
+.sidebar-nav > .sidebar-brand {
+    height: 65px;
+    font-size: 18px;
+    line-height: 60px;
+}
+
+.sidebar-nav > .sidebar-brand a {
+    color: #999999;
+}
+
+.sidebar-nav > .sidebar-brand a:hover {
+    color: #fff;
+    background: none;
+}
+
+@media (min-width: 768px) {
+    #wrapper {
+        padding-right: 500px;
+    }
+
+    #wrapper.toggled {
+        padding-right: 0;
+    }
+
+    #sidebar-wrapper {
+        width: 500px;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        width: 0;
+    }
+
+    #page-content-wrapper {
+        padding: 20px;
+        position: relative;
+    }
+
+    #wrapper.toggled #page-content-wrapper {
+        position: relative;
+        margin-left: 0;
+    }
+}
+/* end of article_read summary and rating sidebar style*/
+
+
+
+/* star rating css starts */
 div.stars {
     width: 150px;
     display: inline-block;
@@ -213,23 +370,112 @@ label.star:before {
     content: '\f006';
     font-family: FontAwesome;
 }
-
-/* star rating end ---------------------*/
-
+/* star rating end */
 
 /* individual article */
-.article-content img {
-    width:100%;
-    padding-bottom: 20px;
-}
-
+/*.article-content img {*/
+    /*width: 100%;*/
+    /*padding-bottom: 20px;*/
+/*}*/
 /* end of individual article*/
+/* end of article-read.html */
 
-
-/* profile page*/
+/* ====== start of user_profile.html ======*/
 .user-portrait-lg {
     width: 100px;
     height: 100px;
 }
+/* end of user_profile.html */
 
-/* end of profile page*/
+/*====== Start of discover.html ======*/
+.row {
+    -moz-column-width: 18em;
+    -webkit-column-width: 18em;
+    -moz-column-gap: 1em;
+    -webkit-column-gap:1em;
+}
+
+
+
+.card-detail {
+    width: 100%;
+    padding-bottom: 5px;
+}
+
+.discover-summary {
+    border-top: 1px solid rgba(0, 0, 0, 0.125);
+    padding-top: 3px;
+}
+
+.discover-thumb-author-info {
+    width: 100%;
+}
+
+.discover-user-and-date p {
+    margin: 0;
+    font-size: 0.75rem;
+}
+
+.discover-rating {
+    text-align: center;
+    font-size: 1.1rem;
+    padding-top: 5px;
+}
+
+.article-thumb-score {
+    z-index: 100;
+    position: absolute;
+    overflow: hidden;
+    background: var(--main-slate-color);
+    box-shadow: 1px 1px 1px black;
+    font-size: 1.1rem;
+    color: white;
+    left: -5px;
+    top: 10px;
+    padding: 0 10px 0px;
+    border-radius: 2px;
+}
+
+
+
+/* ====== start of login.html ====== */
+.form-signin {
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+}
+
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+    margin-bottom: 10px;
+}
+
+.form-signin .checkbox {
+    font-weight: normal;
+}
+
+.form-signin .form-control {
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+
+.form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+/* end of login.html*/

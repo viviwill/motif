@@ -1,0 +1,91 @@
+{% extends 'motifapp/base.html' %}
+{% load staticfiles %}
+{% load motifapp_extra %}
+
+{% block body %}
+<div class="container-fluid">
+    <!--<ul class="grid effect-2" id="grid">-->
+    <div class="row masonry-container">
+        {% for article in following_saved_article %}
+        <div class="col-sm-6 col-md-3 item" style="padding: 0px 8px 0;">
+            <a href="{{ article.id }}" class="article-thumb-link">
+                <div class="card">
+                    <img class="card-img-top img-fluid" src="{{ article.lead_image_url }}"
+                         alt="Card image cap">
+                    <p class="article-thumb-score">
+                        {% if ratings|find_avg_c:article.id is not None%}
+                        <i class="fa fa-lightbulb-o" aria-hidden="true">
+                            {{ ratings|find_avg_c:article.id }}</i>
+                        {% endif %}
+                    </p>
+
+                    <div class="card-block">
+                        <h4 class="card-title">{{ article.title }}</h4>
+                        <small class="text-muted">{{ article.word_count|divide:200}} mins read |
+                            {{article.domain|domain_shorten }} | {{ article.add_date|date:"M j, y "}}
+                        </small>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for x in article.storage_from_followings %}
+                        {% if x.rating_c is not None %}
+                        <div class="list-group-item">
+                            <div class="card-detail">
+                                <div class="row">
+                                    <div class="col-2">
+                                        <img src="{{MEDIA_URL}}{{ x.user.socialprofile.user_portrait }}"
+                                             class="summary-portrait rounded-circle">
+                                    </div>
+                                    <div class="col-5 discover-user-and-date">
+                                        <p>{{ x.user }}</p>
+                                        <p>{{ x.add_date|naturaltime}}</p>
+                                    </div>
+                                    <div class="col-2 discover-rating">
+                                        {% if x.rating_c is not None %}
+                                        <i class="fa fa-lightbulb-o" aria-hidden="true">&nbsp{{x.rating_c|floatformat}}</i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-2 discover-rating">
+                                        {% if x.rating_c is not None %}
+                                        <i class="fa fa-book" aria-hidden="true">&nbsp{{x.rating_i|floatformat}}</i>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% if x.summary is not None %}
+                            <div class="discover-summary">
+                                <p>{{ x.summary }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!--<link rel="stylesheet" type="text/css" href="{% static 'js/default.css' %}" />-->
+<!--<link rel="stylesheet" type="text/css" href="{% static 'js/component.css' %}" />-->
+<!--<script src= "{% static 'js/modernizr.custom.js' %}"></script>-->
+<!--<script src= "{% static 'js/imagesloaded.js' %}"></script>-->
+<!--<script src= "{% static 'js/classie.js' %}"></script>-->
+<!--<script src= "{% static 'js/AnimOnScroll.js' %}"></script>-->
+<!--<script>-->
+<!--new AnimOnScroll( document.getElementById( 'grid' ), {-->
+<!--minDuration : 0.4,-->
+<!--maxDuration : 0.7,-->
+<!--viewportFactor : 0.2-->
+<!--} );-->
+<!--</script>-->
+<script>
+    var $container = $('.masonry-container');
+    $container.masonry({
+        columnWidth: '.item',
+        itemSelector: '.item'
+    });
+</script>
+
+{% endblock %}

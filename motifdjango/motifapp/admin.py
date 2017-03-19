@@ -3,8 +3,16 @@ from django.contrib import admin
 from .models import *
 
 
+class UserAdmin(admin.ModelAdmin):
+    list_display = ('id', 'username', 'email', 'date_joined','last_login')
+
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+
+
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'domain',
+    list_display = ('id', 'title', 'author', 'domain',
                     'add_date', 'pub_date', 'word_count')
 
 
@@ -14,20 +22,6 @@ class StorageAdmin(admin.ModelAdmin):
 
 class SocialprofileAdmin(admin.ModelAdmin):
     model = SocialProfile.follows.through
-
-
-# class FollowsInline(admin.TabularInline):
-#     model = SocialProfile.follows.through
-#
-#
-# class UserAdmin(admin.ModelAdmin):
-#     list_display = ('user', 'follows')
-#     inlines = [FollowsInline, ]
-
-
-# @admin.register(SocialprofileAdmin)
-# class SocialFollow(admin.ModelAdmin):
-#     inlines = (SocialprofileAdmin,)
 
 
 # Models that listed in admin

@@ -1,95 +1,193 @@
-{% extends 'motifapp/base.html' %}
+{% extends 'motifapp/base_article_read.html' %}
+{% load motifapp_extra %}
+
 
 {% block body %}
-<div class="container">
-    <div class="article-header col-md-8">
-        <h1 class="article-title">{{ article.title }} </h1>
-        <p class="source-description">
-            <a href="{{ article.web_url }}" target="_blank">{{ article.domain }}</a>
-        </p>
+<div id="wrapper" class="toggled"">
+    <!-- Article Content -->
+    <div class="row">
+        <div id="page-content-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="article-wrapper">
 
-        <div class="article-main">
-            <div class="article-content">
-                {{ article.body_content|safe }}
-            </div>
-        </div>
+                            <!--article body -->
+                            <div class="row">
+                                <div id="article-main-margin-1" class="col-sm-1 col-md-2"></div>
+                                <div class="article-main col-sm-10 col-md-8" id="article-main">
 
-    </div>
+                                    <!--testing -->
+                                    {% if storage_entry %}
+                                    <p> it's here </p>
+                                    {% else %}
+                                    <button id="save-article" class="btn btn-primary btn-sm"
+                                            type="button"> SAVE
+                                    </button>
+                                    {% endif %}
 
-
-    <div class="col-md-4 sidebar">
-        <!-- star rating section -->
-        <div class="rating-wrapper">
-            <div class="col-lg-12 rating">
-                <div class="overall-rating col-lg-6">
-                    <div class="creative-rating">4/5</div>
-                    <div class="informative-rating">4/5</div>
-                </div>
-                <div class="user-rating col-lg-6">
-                    <!-- rating submission -->
-                    <a href="#" class="" data-toggle="modal" data-target="#myModal">
-                        <div class="edit-rating-wrapper">
-                        {% if storage_entry.rating_c %}
-                            <div class="creative-rating"> {{ storage_entry.rating_c }}</div>
-                            <div class="informative-rating">{{ storage_entry.rating_i }}</div>
-                        {% else %}
-                            <div class="creative-rating">Rate this</div>
-                            <div class="creative-rating">Article </div>
-                        {% endif %}
+                                    <div class="article-title" id="article-title">
+                                        <h1 class="article-title">{{ article.title }} </h1>
+                                    </div>
+                                    <div class="row source-description">&nbsp&nbsp&nbsp&nbsp&nbsp
+                                        {% if article.author is not None %}
+                                        <p>by {{ article.author }},&nbsp</p>
+                                        {% endif %}
+                                        <a href="{{ article.web_url }}" target="_blank">
+                                            {{ article.domain}}
+                                        </a>
+                                    </div>
+                                    <div class="article-content"
+                                         style="font-size: {{request.user.socialprofile.theme_font_size}}rem;">
+                                        {{ article.body_content|safe }}
+                                    </div>
+                                </div>
+                                <div id="article-main-margin-2" class="col-sm-1 col-md-2"></div>
+                            </div>
                         </div>
-                    </a>
-                </div>
-                <div class="rating-explain col-lg-6">
-                    <div class="number-of-rating">1,923</div>
-                </div>
-                <div class="rating-explain col-lg-6">
-                    <div class="user-rating-explain">You</div>
+                    </div>
                 </div>
             </div>
         </div>
+        <!-- /#page-content-wrapper -->
 
-        <!-- user's own summary -->
-        <div class="user-summary">
-            <div class="time-cost">
-            <h3>{{ reading_time }} mins read <a href="#" data-toggle="tooltip" title="Average readers reach around 200 words per minute with a typical comprehension of 60%."><span class="glyphicon glyphicon-question-sign"></span></a></h3>
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <div class="toggle-button">
+                <a href="#menu-toggle" class="menu-toggle" style="text-decoration:none;"> motif </a>
+                <p>&nbsp</p>
             </div>
-            {% if storage_entry.summary %}
-            <p>Your Summary: {{ storage_entry.summary }}</p>
-            <p>Last edit: {{ storage_entry.summary_modified_date }}</p>
-            <div class="col-md-6">
-                <a href="{% url 'motifapp:summary_edit' article.id %}"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
-            </div>
-            <div class="col-md-6">
-                <a href="{% url 'motifapp:summary_delete' article.id %}"><span class="glyphicon glyphicon-trash"></span> Delete</a>
-            </div>
-            {% else %}
-            <a href="{% url 'motifapp:summary_edit' article.id %}">Summarize</a>
-            {% endif %}
-            </form>
-        </div>
+            <!-- star rating section -->
+            <div class="card article-read-user-info">
+                <div class="card-block">
+                    <div class="row">
+                        <div class="overall-rating col-md-6">
+                            <div class="creative-rating">4/5</div>
+                            <div class="informative-rating">4/5</div>
+                        </div>
+                        <div class="user-rating col-md-6">
+                            <!-- rating submission -->
+                            <a href="#" class="" data-toggle="modal" data-target="#myModal">
+                                <div class="edit-rating-wrapper">
+                                    {% if storage_entry.rating_c %}
+                                    <div class="creative-rating"> {{ storage_entry.rating_c }}</div>
+                                    <div class="informative-rating">{{ storage_entry.rating_i }}
+                                    </div>
+                                    {% else %}
+                                    <div class="creative-rating">Rate this</div>
+                                    <div class="creative-rating">Article</div>
+                                    {% endif %}
+                                </div>
+                            </a>
+                        </div>
+                        <div class="rating-explain col-md-6">
+                            <div class="number-of-rating">1,923</div>
+                        </div>
+                        <div class="rating-explain col-md-6">
+                            <div class="user-rating-explain">Yours</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer text-muted time-cost">
+                    <h5>{{ reading_time }} mins read
+                        <a href="#" data-toggle="tooltip"
+                           title="Average readers reach around 200 words per minute with a typical comprehension of 60%."><span
+                                class="glyphicon glyphicon-question-sign"></span></a></h5>
+                </div>
 
-        <!-- summaries from other users-->
-        <div class="summary_other">
-            <hr/>
-            <hr/>
-            <p>{{ storage_entry.summary }}</p>
-            <p>by: {{ request.user }}</p>
-            <hr/>
-            <p>{{ storage_entry.summary }}</p>
-            <p>by: {{ request.user }}</p>
-            <hr/>
-            <p>{{ storage_entry.summary }}</p>
-            <p>by: {{ request.user }}</p>
-            <hr/>
+                <!-- Your summary -->
+                <div class="card-block">
+                    {% if storage_entry.summary %}
+                    <p id="user-summary">{{ storage_entry.summary }}</p>
+                    {% else %}
+                    <button id="summarize-button" class="btn btn-primary">Summarize</button>
+                    {% endif %}
+                    <!-- summary form here -->
+                    <form id="summarize-form" role="form" method="post"
+                          action="{% url 'motifapp:summary_edit' article.id %}"
+                          enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="" style="padding-bottom: 10px;">
+                            <textarea class="form-control"
+                             {% if not summary %}
+                             placeholder="Summarize here"
+                             {% endif %} rows="10"
+                             id="summary" name="summary" type="text">{% if storage_entry.summary %}{{ storage_entry.summary }}{% endif %}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm"> Save</button>
+                        &nbsp&nbsp
+                        <button id="summarize-close-button" class="btn btn-primary btn-sm"
+                                type="button"> Close
+                        </button>
+                    </form>
+                    <!-- summary form end -->
+                </div>
+                {% if storage_entry.summary %}
+                <div class="card-footer text-muted" id="summary-edit-footer">
+                    <div class="row user-summary-edit-date">
+                        <div class="col-5">
+                            <button id="summarize-edit-button" class="btn btn-primary btn-sm"
+                                    type="button"> Edit
+                            </button>
+                            &nbsp&nbsp
+                            <a href="{% url 'motifapp:summary_delete' article.id %}"
+                               class="btn btn-primary btn-sm">Delete</a>
+                        </div>
+                        <div class="col-7">
+                            <p>Last edit: {{ storage_entry.summary_modified_date|naturaltime }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="card">
+                <ul class="list-group list-group-flush">
+                    {% for x in article.storage_from_followings %}
+                    {% if x.summary is not None %}
+                    <li class="list-group-item">
+                        <div class="card-detail">
+                            <div class="row">
+                                <div class="col-2">
+                                    <img src="{{MEDIA_URL}}{{ x.user.socialprofile.user_portrait }}"
+                                         class="summary-portrait rounded-circle">
+                                </div>
+                                <div class="col-6 discover-user-and-date">
+                                    <p>{{ x.user }}</p>
+                                    <p>{{ x.add_date|naturaltime}}</p>
+                                </div>
+                                <div class="col-2 discover-rating">
+                                    {% if x.rating_c is not None %}
+                                    <i class="fa fa-lightbulb-o" aria-hidden="true">&nbsp{{x.rating_c|floatformat}}</i>
+                                    {% endif %}
+                                </div>
+                                <div class="col-2 discover-rating">
+                                    {% if x.rating_c is not None %}
+                                    <i class="fa fa-book" aria-hidden="true">&nbsp{{x.rating_i|floatformat}}</i>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <p>{{ x.summary }}</p>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
+        <!-- /#sidebar-wrapper -->
     </div>
 </div>
-</div>
-
 
 {% include 'motifapp/star_rating_template.html' %}
+
 <script>
-    $(document).ready(function(){
+    function goBack() {
+        window.history.back()
+    }
+
+
+    $(document).ready(function () {
         $('[data-toggle="tooltip"]').tooltip();
     });
 
@@ -98,6 +196,115 @@
         html: 'true',
         placement: 'top'
     })
+
+    // toggle button here
+    $(".menu-toggle").click(function (e) {
+        e.preventDefault();
+        $("#wrapper").toggleClass("toggled");
+        $("#article-main").toggleClass("col-md-8");
+        $("#article-main-margin-1").toggleClass("col-md-2");
+        $("#article-main-margin-2").toggleClass("col-md-2");
+    });
+
+    //show/hide summary form
+    $('#summarize-form').hide();
+    $(document).ready(function () {
+        $("#summarize-button").click(function () {
+            console.log("click sum button!!!!");
+            $('#summarize-form').show();
+            $("#summarize-button").hide();
+        });
+    });
+
+    // summary form close button
+    $(document).ready(function () {
+        $("#summarize-close-button").click(function () {
+            $('#user-summary').show();
+            $("#summarize-button").show();
+            $('#summarize-form').hide();
+            $('#summary-edit-footer').show();
+        });
+    });
+
+    // sumamry edit button
+    $(document).ready(function () {
+        $("#summarize-edit-button").click(function () {
+            $('#summarize-form').show();
+            $('#user-summary').hide();
+            $('#summary-edit-footer').hide();
+        });
+    });
+
+    //summary form submission
+    $(document).on('submit', '#summarize-form', function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: "summary_edit/",
+            data: {
+                summary: $('#summary').val(),
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function (response) {
+                var update_summary;
+                console.log('whats going on here..');
+                $('#summarize-form').hide();
+                $('#user-summary').html(response['update_summary']);
+                $('#user-summary').show();
+                $('#summary-edit-footer').show();
+            }
+        });
+    });
+
+    //add article from discover article view
+    $(document).on('submit', '#summarize-form', function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: "summary_edit/",
+            data: {
+                summary: $('#summary').val(),
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function (response) {
+                console.log('sent');
+            }
+        });
+    });
+
+    // change font+
+    $("#font-minus").click(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: "theme_edit/",
+            data: {
+                'font_size': 'minus',
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function (response) {
+                $(".article-content").css("font-size", response['font_size']);
+            }
+        });
+    });
+
+    // change font-
+    $("#font-plus").click(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'POST',
+            url: "theme_edit/",
+            data: {
+                'font_size': 'plus',
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function (response) {
+                $(".article-content").css("font-size", response['font_size']);
+            }
+        });
+    });
+
+
 </script>
 {% endblock %}
 

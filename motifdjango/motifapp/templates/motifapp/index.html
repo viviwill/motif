@@ -1,53 +1,59 @@
 {% extends 'motifapp/base.html' %}
+{% load staticfiles %}
+{% load motifapp_extra %}
 
 {% block body %}
 <div class="container-fluid">
     <div class="row">
-        <div class="col-lg-12 ">
-            <div class="search-tool"></div>
+        <!--seartch tool-->
+        <div class="search-tool"></div>
 
-            <!-- article thumbnails -->
+        <!-- article card starts here -->
+        <div class="card-deck">
             {% for article in user_saved_article %}
-            <div class="col-md-3 col-sm-6">
-                <div class="hovereffect">
-                    <div class="article-thumb">
-                        <a href="{{ article.id }}">
-                            <div class="item-image">
-                                <img src="{{ article.lead_image_url }}" class="img-responsive">
-                            </div>
-                        </a>
-                        <div class="item-content">
-                            <div class="item-text">
-                                <h4 class="thumb-title">{{ article.title }}</h4>
-                                {% if article.storage__rating_i is not None %}
-                                    <p>  &nbsp
-                                        <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
-                                        {{ article.storage__rating_c }}  &nbsp
-                                        <i class="fa fa-book" aria-hidden="true"></i>
-                                        {{ article.storage__rating_i }}
-                                    </p>
-                                {% else %}
-                                <p style=" color: transparent">.</p>
+            <div class="col-sm-6 col-md-3" style="padding: 0px 8px 0;">
+                <a href="{{ article.id }}" class="article-thumb-link">
+                    <div class="card">
+                        <!-- article card image -->
+                        <div class="lead-image">
+                            <img class="card-img-top img-fluid" src="{{ article.lead_image_url }}">
+                            <p class="article-thumb-score">
+                                {% if article.storage__rating_i%}
+                                <i class="fa fa-lightbulb-o" aria-hidden="true">
+                                    {{ article.storage__rating_i }}</i>
                                 {% endif %}
+                            </p>
+                        </div>
 
-                                {% if article.storage__summary is None %}
-                                    <p><i>Saved on: {{ article.storage__add_date|date:'N j, o' }}</i></p>
-                                {% else %}
-                                <p class= "summary-date"><i><span>Summed on: {{ article.storage__summary_modified_date|date:'N j, o' }}</span></i></p>
-                                {% endif %}
-                            </div>
+                        <!--article card info -->
+                        <div class="card-block">
+                            <h4 class="card-title">{{ article.title }}</h4>
+                            <small class="text-muted">{{ article.word_count|divide:200}} mins read | {{ article.domain|domain_shorten }} | {{ article.storage__add_date|date:"M j, y "}} </small>
+                        </div>
+                        <div class="card-block">
+                            {% if article.storage__summary is None %}
+                            <p><i>Saved on: {{ article.storage__add_date|date:'N j, o' }}</i></p>
+                            {% else %}
+                            <p class="summary-date"><i><span>Summed on: {{ article.storage__summary_modified_date|date:'N j, o' }}</span></i>
+                            </p>
+                            {% endif %}
+                            <form action="{% url 'motifapp:article_delete' article.id %}"
+                                  method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="article_id" value="{{ article.id }}"/>
+                                <button type="submit" class="btn btn-default btn-sm">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                </button>
+                            </form>
+
+                            <!--<a href="{% url 'motifapp:article_delete' article.id %}">-->
+                            <!--<i class="fa fa-trash-o" aria-hidden="true"></i>-->
+                            <!--</a>-->
                         </div>
                     </div>
-                    <div class="col-md-12 overlay">
-                        <p class="hover-text">{{ article.storage__summary|truncatewords:50 }}...</p>
-                        <p class="hover-link">
-                            <a href="{{ article.id }}">Read Article</a>
-                        </p>
-                    </div>
-                </div>
+                </a>
             </div>
             {% endfor %}
-            <!-- end article thumbnails -->
         </div>
     </div>
 </div>

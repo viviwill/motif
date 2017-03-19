@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}Motif{% endblock %}</title>
+    <meta charset="UTF-8">
+
+    {% load staticfiles %}
+    {% load motifapp_extra %}
+    <!--Bootstrap 4-->
+    <script src="https://code.jquery.com/jquery-3.2.0.js"
+            integrity="sha256-wPFJNIFlVY49B+CuAIrDr932XSb6Jk3J1M22M3E2ylQ="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js"
+            integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
+            integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+            crossorigin="anonymous"></script>
+    <script src="{% static 'el-pagination/js/el-pagination.js' %}"></script>
+    <script src="{% static 'js/masonry.pkgd.min.js' %}"></script>
+
+    <!--font awesome -->
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'stylesheet/style.css' %}">
+
+    {% load compress %}
+    {% compress css %}
+    <link rel="stylesheet" type="text/x-scss" href="{% static 'stylesheet/main.scss' %}"/>
+    {% endcompress %}
+    <link rel="stylesheet" type="text/css" href="{% static 'stylesheet/main.css' %}">
+    <!-- END OF LOAD -->
+</head>
+<body>
+<nav class="navbar navbar-light fixed-top" style="background-color: #fefefe;">
+        <div class="row">
+            <div class="col-2">
+                <a onclick="goBack()" href="#">
+                    <i class="fa fa-arrow-circle-left fa-2x" aria-hidden="true"></i>
+                </a>
+            </div>
+            <div class="col-7"></div>
+            <div class="col-3">
+                <button type="button" class="btn btn-primary">Theme</button>
+                <div class="btn-group mr-2" role="group" aria-label="First group">
+                    <button type="button" id="font-minus" class="btn btn-secondary">A-</button>
+                    <button type="button" id="font-plus" class="btn btn-secondary">A+</button>
+                </div>
+            </div>
+        </div>
+</nav>
+{% block body %}
+{% endblock %}
+</body>
+</html>

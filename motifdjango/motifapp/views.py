@@ -8,7 +8,13 @@ from django.views import generic
 from django.views.generic.edit import FormMixin
 from django.views.generic import View
 from django.conf import settings
-from django.db.models import Count
+from django.db.models import Count, Avg, Sum
+from django.http import JsonResponse
+from django.core.exceptions import ObjectDoesNotExist
+
+from django.db.models import Prefetch
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from el_pagination.views import AjaxListView
 
 # ------------
 from .forms import *
@@ -42,19 +48,69 @@ class IndexView(generic.ListView):
 
         # user saved article list
         article_list = Article.objects.filter(storage__user=user.id).order_by('-add_date')
-        article_list = Article.objects.filter(storage__user=user.id).order_by('-add_date')
         context['user_saved_article'] = article_list.values('id', 'title', 'lead_image_url',
+                                                            'domain', 'word_count',
                                                             'storage__add_date', 'storage__summary',
                                                             'storage__summary_modified_date',
                                                             'storage__rating_i',
                                                             'storage__rating_c')
-        # context['saved_list'] = Article.objects.annotate(number_of_entries=Count('storage')).order_by('-number_of_entries')
+        # context['saved_list'] = Article.objects.annotate(number_of_entries=Count('storage'))
+        # .order_by('-number_of_entries')
         return context
 
+
+def article_delete(request, article_id):
+    user_storage = Storage.objects.filter(user_id=request.user).get(article_id=article_id)
+    user_storage.delete()
+    return redirect('motifapp:index')
+
+
+@method_decorator(login_required, name='dispatch')
+class DiscoverView(generic.ListView):
+    model = Article
+    template_name = 'motifapp/discover.html'
+    page_template = 'motifapp/discover_entry.html'
+    context_object_name = 'article_list'
+
+    def get_queryset(self):
+        return Article.objects.order_by('-add_date')[:20]
+
+    def get_context_data(self, **kwargs):
+        context = super(DiscoverView, self).get_context_data(**kwargs)
+        user = self.request.user
+
+        # get all followings
+        followings = user.socialprofile.follows.all()
+        followings_list = list(followings.values_list('user', flat=True).order_by('user'))
+
+        # get all article following saved with distinct, prefetch to eliminate unfollow data
+        distinct_saved = Article.objects.filter(
+            storage__user__in=followings_list).distinct().order_by('-add_date')
+        following_saved_article = distinct_saved.prefetch_related(
+            models.Prefetch('storage_set', queryset=Storage.objects.filter(
+                user__in=followings_list), to_attr='storage_from_followings'))
+        context['following_saved_article'] = following_saved_article
+
+        # rating
+        distinct_saved_list = distinct_saved.values_list('id', flat=True).order_by('id')
+        ratings = Article.objects.filter(id__in=distinct_saved_list).annotate(
+            total_saved=Count('storage__user'),
+            avg_i=Avg('storage__rating_i'),
+            avg_c=Avg('storage__rating_c'))
+        context['ratings'] = ratings
+        return context
+
+
 # individual article display view
+@login_required
 def article_read(request, article_id):
     user = request.user
-    storage_entry = Storage.objects.filter(user_id=user).get(article_id=article_id)
+    storage_entry = None
+    try:
+        storage_entry = Storage.objects.filter(user_id=user).get(article_id=article_id)
+    except ObjectDoesNotExist:
+        pass
+
     article = get_object_or_404(Article, pk=article_id)
     return render(request, 'motifapp/article_read.html',
                   {'article': article,
@@ -80,7 +136,9 @@ def summary_edit(request, article_id):
         user_storage.save()
 
         # once finish editing, go back to article page
-        return redirect('motifapp:article_read', article_id)
+        # return redirect('motifapp:article_read', article_id)
+        # return render(request, 'motifapp/article_read.html', {'summary': summary})
+        return JsonResponse({'update_summary': summary})
     else:
         user = request.user
         summary = Storage.objects.filter(user_id=user).get(article_id=article_id).summary
@@ -101,6 +159,7 @@ def summary_delete(request, article_id):
     return redirect('motifapp:article_read', article_id)
 
 
+# edit rating
 def rating_edit(request, article_id):
     if request.method == "POST":
         user_storage = Storage.objects.filter(user_id=request.user).get(article_id=article_id)
@@ -120,7 +179,7 @@ def rating_edit(request, article_id):
 
 # add article
 def article_add(request):
-    print "is adding an article"
+    print "Adding an article"
     if request.method == "POST":
         web_url = request.POST['web_url']
         article_crawl = motif_crawler.Uploadarticle(str(web_url))
@@ -131,6 +190,22 @@ def article_add(request):
         s = Storage(article_id=target_id, user=request.user, add_date=timezone.now())
         s.save()
         return redirect('motifapp:index')
+
+
+def article_edit_theme(request, article_id):
+    print "changing font size"
+    if request.method == "POST":
+        profile = request.user.socialprofile
+        change = request.POST['font_size']
+        if change == "plus":
+            if profile.theme_font_size < 2:
+                profile.theme_font_size += 0.2
+        elif change == 'minus':
+            if profile.theme_font_size > 1:
+                profile.theme_font_size -= 0.2
+        profile.save()
+
+        return JsonResponse({'font_size': str(profile.theme_font_size) +'rem'})
 
 
 # =============== User register/login/logout ===================
@@ -202,7 +277,7 @@ def logout_user(request):
     context = {
         'form': form,
     }
-    return render(request, 'motifapp/login.html', context)
+    return redirect('motifapp:login')
 
 
 class UserProfile(generic.DetailView, FormMixin):
@@ -236,35 +311,8 @@ class UserProfile(generic.DetailView, FormMixin):
             except OSError:
                 pass
 
-
             update_profile = SocialProfile.objects.get(user=self.request.user)
             update_profile.user_portrait = portrait
             update_profile.save()
 
-
-
         return render(request, self.template_name, {'form': form})
-
-        # if form.is_valid():
-        #     user = form.save(commit=False)
-        #     # cleaned (normalized) data
-        #     username = form.cleaned_data['username']
-        #     password = form.cleaned_data['password']
-        #
-        #     # django built in way to set password
-        #     user.set_password(password)
-        #     user.save()
-        #
-        #     # create a profile after user successfully register
-        #     SocialProfile.objects.get_or_create(user=user)
-        #
-        #     # take user and pw, check db if they exist/active
-        #     user = authenticate(username=username, password=password)
-        #     if user is not None:
-        #         if user.is_active:
-        #             login(request, user)
-        #             return redirect('motifapp:index')
-        #
-        # # if user didn't login, here is the form to try again
-        # return render(request, self.templates_name, {'form': form})
-
