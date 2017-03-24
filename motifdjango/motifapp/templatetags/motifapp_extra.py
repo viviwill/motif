@@ -9,21 +9,24 @@ register = template.Library()
 
 
 @register.filter
-def find_avg_i(value, arg):
-    index = [art.id for art in value].index(arg)
-    avg_i = [art.avg_i for art in value][index]
-    if avg_i is not None:
-        avg_i = round(avg_i, 0)
-    return avg_i
-
+def find_number_of_rating(value, arg):
+    try:
+        index = [art.id for art in value].index(arg)
+        return [art.total_rated for art in value][index]
+    except ValueError:
+        return None
 
 @register.filter
+# {{ ratings|find_avg_c:article.id }}
 def find_avg_c(value, arg):
-    index = [art.id for art in value].index(arg)
-    avg_c = [art.avg_c for art in value][index]
-    if avg_c is not None:
-        avg_c = round(avg_c, 0)
-    return avg_c
+    try:
+        index = [art.id for art in value].index(arg)
+        avg_c = [art.avg_c for art in value][index]
+        if avg_c is not None:
+            avg_c = round(avg_c, 0)
+        return avg_c
+    except ValueError:
+        return None
 
 
 @register.filter
@@ -43,6 +46,11 @@ def divide(value, arg):
         return int(value) / int(arg)
     except (ValueError, ZeroDivisionError):
         return None
+
+
+@register.filter
+def sub(value, arg):
+    return int(value) - int(arg)
 
 
 def django_original_naturaltime(value):

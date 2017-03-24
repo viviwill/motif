@@ -4,9 +4,11 @@
     <title>{% block title %}Motif{% endblock %}</title>
     <meta charset="UTF-8">
 
+
     {% load staticfiles %}
     {% load motifapp_extra %}
     <!--Bootstrap 4-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.0.js"
             integrity="sha256-wPFJNIFlVY49B+CuAIrDr932XSb6Jk3J1M22M3E2ylQ="
             crossorigin="anonymous"></script>
@@ -16,7 +18,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"
             integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
             crossorigin="anonymous"></script>
-    <script src="{% static 'el-pagination/js/el-pagination.js' %}"></script>
+    <script type = "text/javascript"
+            src = "https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+    <!--<script src="{% static 'el-pagination/js/el-pagination.js' %}"></script>-->
     <script src="{% static 'js/masonry.pkgd.min.js' %}"></script>
 
     <!--font awesome -->
@@ -24,30 +28,37 @@
           href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
     {% load static %}
+    <link rel="shortcut icon" type="image/png" href="{%  static 'favicon-32x32.png' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'stylesheet/style.css' %}">
-
-    {% load compress %}
-    {% compress css %}
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'stylesheet/main.scss' %}"/>
-    {% endcompress %}
-    <link rel="stylesheet" type="text/css" href="{% static 'stylesheet/main.css' %}">
+    <script type="text/javascript" src= "{% static 'js/motif.js' %}"></script>
     <!-- END OF LOAD -->
 </head>
 <body>
-<nav class="navbar navbar-light fixed-top" style="background-color: #fefefe;">
+<nav class="navbar navbar-light navbar-article-read fixed-top" style="background-color: #fefefe;">
         <div class="row">
-            <div class="col-2">
-                <a onclick="goBack()" href="#">
-                    <i class="fa fa-arrow-circle-left fa-2x" aria-hidden="true"></i>
-                </a>
-            </div>
-            <div class="col-7"></div>
-            <div class="col-3">
-                <button type="button" class="btn btn-primary">Theme</button>
-                <div class="btn-group mr-2" role="group" aria-label="First group">
-                    <button type="button" id="font-minus" class="btn btn-secondary">A-</button>
-                    <button type="button" id="font-plus" class="btn btn-secondary">A+</button>
+            <div class="col-4">
+                <div class="row">
+                    <a onclick="goBack()" href="#" style="margin-left:15px; margin-top: 5px">
+                        <i class="fa fa-arrow-circle-left fa-2x" aria-hidden="true"></i>
+                    </a>
+                    <button id="edit-article-storage" class="btn btn-primary"
+                            value="{{article.id}}"
+                            style="margin-left: 25px; margin-bottom: 5px;">
+                        {% if storage_entry %}SAVED
+                        {% else %}SAVE
+                        {% endif %}
+                    </button>
                 </div>
+            </div>
+            <div class="col-4"></div>
+            <div class="col-4">
+                <span class="pull-right">
+                    <button type="button" class="btn btn-primary">Theme</button>
+                    <div class="btn-group mr-2" role="group" aria-label="First group">
+                        <button type="button" id="font-minus" class="btn btn-secondary">A-</button>
+                        <button type="button" id="font-plus" class="btn btn-secondary">A+</button>
+                    </div>
+                </span>
             </div>
         </div>
 </nav>

@@ -17,7 +17,7 @@ class ArticleAdmin(admin.ModelAdmin):
 
 
 class StorageAdmin(admin.ModelAdmin):
-    list_display = ('user', 'article', 'add_date')
+    list_display = ('user', 'article', 'add_date', "rating_c", 'summary')
 
 
 class SocialprofileAdmin(admin.ModelAdmin):

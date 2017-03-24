@@ -25,7 +25,8 @@ SECRET_KEY = 'v7_f_n=l9&67!9w6a(*ip71r8tz__sz%2l+huz_d0#p(4ph=b6'
 DEBUG = True
 
 # make sure to include the comma inside '[host, ]'
-ALLOWED_HOSTS = ['motif-env.949rgkakfm.us-west-1.elasticbeanstalk.com',
+ALLOWED_HOSTS = ['django-env.us-west-1.elasticbeanstalk.com',
+                 'www.projectbananatree.com',
                  '127.0.0.1',
                  ]
 
@@ -40,8 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     # adding motif app
     'motifapp.apps.MotifappConfig',
-    'compressor',
-    'el_pagination',
 ]
 
 # -------------
@@ -49,13 +48,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     # other finders..
-    'compressor.finders.CompressorFinder',
 )
-
-COMPRESS_PRECOMPILERS = (
-    ('text/x-scss', 'django_libsass.SassCompiler'),
-)
-# -------------------
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -97,16 +90,32 @@ WSGI_APPLICATION = 'motifdjango.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'motif',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
-        'PORT': '3306'
+if 'RDS_HOSTNAME' in os.environ:
+    print "live site server connection"
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ['RDS_DB_NAME'],
+            'OPTIONS': {
+                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],
+            'PORT': os.environ['RDS_PORT'],
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'motif',
+            'USER': 'root',
+            'PASSWORD': '',
+            'HOST': '127.0.0.1',
+            'PORT': '3306'
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -147,7 +156,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = 'static'
 
 LOGIN_URL = '/login/'
 

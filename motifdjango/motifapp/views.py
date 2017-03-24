@@ -1,29 +1,25 @@
-from django.shortcuts import render, redirect, get_object_or_404
+import sys
+
+from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.utils import timezone
-from django.views import generic
-from django.views.generic.edit import FormMixin
-from django.views.generic import View
-from django.conf import settings
-from django.db.models import Count, Avg, Sum
-from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count, Avg
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from django.utils.decorators import method_decorator
+from django.views import generic
+from django.views.generic import View
+from django.views.generic.edit import FormMixin
 
-from django.db.models import Prefetch
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from el_pagination.views import AjaxListView
-
-# ------------
 from .forms import *
 from .models import *
 
-# ------------
-import sys
+import os
 
-sys.path.append('/Users/viviwill/Desktop/motif/')
+# sys.path.append('/Users/viviwill/Desktop/motif/')
 from crawler import motif_crawler
 
 
@@ -47,15 +43,19 @@ class IndexView(generic.ListView):
         context['user'] = self.request.user
 
         # user saved article list
-        article_list = Article.objects.filter(storage__user=user.id).order_by('-add_date')
+        article_list = Article.objects.filter(storage__user=user.id).order_by('-storage__add_date')
         context['user_saved_article'] = article_list.values('id', 'title', 'lead_image_url',
                                                             'domain', 'word_count',
-                                                            'storage__add_date', 'storage__summary',
+                                                            'storage__add_date',
+                                                            'storage__summary',
                                                             'storage__summary_modified_date',
                                                             'storage__rating_i',
-                                                            'storage__rating_c')
-        # context['saved_list'] = Article.objects.annotate(number_of_entries=Count('storage'))
-        # .order_by('-number_of_entries')
+                                                            'storage__rating_c',
+                                                            'storage__public')
+        ratings = Article.objects.filter(storage__rating_c__isnull=False).annotate(
+            total_rated=Count('storage__user'),
+            avg_c=Avg('storage__rating_c'))
+        context['ratings'] = ratings
         return context
 
 
@@ -63,6 +63,14 @@ def article_delete(request, article_id):
     user_storage = Storage.objects.filter(user_id=request.user).get(article_id=article_id)
     user_storage.delete()
     return redirect('motifapp:index')
+
+
+# change privacy setting for saved article
+def article_public_edit(request, article_id):
+    user_storage = Storage.objects.filter(user_id=request.user).get(article_id=article_id)
+    user_storage.public = not user_storage.public
+    user_storage.save()
+    return JsonResponse({'public': user_storage.public})
 
 
 @method_decorator(login_required, name='dispatch')
@@ -93,9 +101,8 @@ class DiscoverView(generic.ListView):
 
         # rating
         distinct_saved_list = distinct_saved.values_list('id', flat=True).order_by('id')
-        ratings = Article.objects.filter(id__in=distinct_saved_list).annotate(
-            total_saved=Count('storage__user'),
-            avg_i=Avg('storage__rating_i'),
+        ratings = Article.objects.filter(id__in=distinct_saved_list).filter(storage__rating_c__isnull=False).annotate(
+            total_rated=Count('storage__user'),
             avg_c=Avg('storage__rating_c'))
         context['ratings'] = ratings
         return context
@@ -106,6 +113,12 @@ class DiscoverView(generic.ListView):
 def article_read(request, article_id):
     user = request.user
     storage_entry = None
+
+    # rating for this article
+    art_temp = Article.objects.filter(id=article_id).filter(storage__rating_c__isnull=False)
+    ratings = art_temp.annotate(total_rated=Count('storage__user'), avg_c=Avg('storage__rating_c'))
+
+    # gather all storage data from article
     try:
         storage_entry = Storage.objects.filter(user_id=user).get(article_id=article_id)
     except ObjectDoesNotExist:
@@ -117,6 +130,7 @@ def article_read(request, article_id):
                    'user': user,
                    'storage_entry': storage_entry,
                    'reading_time': article.word_count / 200,
+                   'ratings': ratings
                    })
 
 
@@ -135,9 +149,6 @@ def summary_edit(request, article_id):
         user_storage.summary_modified_date = timezone.now()
         user_storage.save()
 
-        # once finish editing, go back to article page
-        # return redirect('motifapp:article_read', article_id)
-        # return render(request, 'motifapp/article_read.html', {'summary': summary})
         return JsonResponse({'update_summary': summary})
     else:
         user = request.user
@@ -179,17 +190,37 @@ def rating_edit(request, article_id):
 
 # add article
 def article_add(request):
-    print "Adding an article"
     if request.method == "POST":
+        print "Add article with url"
         web_url = request.POST['web_url']
         article_crawl = motif_crawler.Uploadarticle(str(web_url))
         article_crawl.sql_upload()
 
         # update storage
         target_id = article_crawl.get_article_id()
-        s = Storage(article_id=target_id, user=request.user, add_date=timezone.now())
-        s.save()
+        check = Storage.objects.filter(article_id=target_id).filter(user=request.user).count()
+        if check == 0:
+            s = Storage(article_id=target_id, user=request.user, add_date=timezone.now())
+            s.save()
+        else:
+            print "Article exsited in user storage"
         return redirect('motifapp:index')
+
+
+# edit article storage
+def article_storage_edit(request, article_id):
+    print "edit article storage setting for: ", article_id
+    if request.method == "POST":
+        user=request.user
+        try:
+            storage_entry = Storage.objects.filter(user_id=user).get(article_id=article_id)
+            storage_entry.delete()
+            storage_status = "SAVE"
+        except ObjectDoesNotExist:
+            new_storage = Storage(article_id=article_id, user=user, add_date=timezone.now())
+            new_storage.save()
+            storage_status = "SAVED"
+        return JsonResponse({'storage_status': storage_status})
 
 
 def article_edit_theme(request, article_id):
@@ -205,7 +236,7 @@ def article_edit_theme(request, article_id):
                 profile.theme_font_size -= 0.2
         profile.save()
 
-        return JsonResponse({'font_size': str(profile.theme_font_size) +'rem'})
+        return JsonResponse({'font_size': str(profile.theme_font_size) + 'rem'})
 
 
 # =============== User register/login/logout ===================

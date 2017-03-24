@@ -7,42 +7,38 @@
     <!-- Article Content -->
     <div class="row">
         <div id="page-content-wrapper">
-            <div class="container-fluid">
+            <div class="container-fluid no-padding">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="article-wrapper">
 
                             <!--article body -->
                             <div class="row">
-                                <div id="article-main-margin-1" class="col-sm-1 col-md-2"></div>
-                                <div class="article-main col-sm-10 col-md-8" id="article-main">
-
-                                    <!--testing -->
-                                    {% if storage_entry %}
-                                    <p> it's here </p>
-                                    {% else %}
-                                    <button id="save-article" class="btn btn-primary btn-sm"
-                                            type="button"> SAVE
-                                    </button>
-                                    {% endif %}
-
-                                    <div class="article-title" id="article-title">
-                                        <h1 class="article-title">{{ article.title }} </h1>
-                                    </div>
-                                    <div class="row source-description">&nbsp&nbsp&nbsp&nbsp&nbsp
-                                        {% if article.author is not None %}
-                                        <p>by {{ article.author }},&nbsp</p>
-                                        {% endif %}
-                                        <a href="{{ article.web_url }}" target="_blank">
-                                            {{ article.domain}}
-                                        </a>
+                                <div id="article-main-margin-1" class="col-lg-2"></div>
+                                <div class="article-main col-lg-8 col-md-12" id="article-main">
+                                    <div class="article-header">
+                                        <div class="article-title" id="article-title">
+                                            <h1 class="article-title">{{ article.title }} </h1>
+                                        </div>
+                                        <div class="row source-description">&nbsp&nbsp&nbsp&nbsp&nbsp
+                                            {% if article.author is not None %}
+                                            <p>by {{ article.author }},&nbsp</p>
+                                            {% endif %}
+                                            <a href="{{ article.web_url }}" target="_blank">
+                                                {{ article.domain}}
+                                            </a>
+                                        </div>
                                     </div>
                                     <div class="article-content"
                                          style="font-size: {{request.user.socialprofile.theme_font_size}}rem;">
                                         {{ article.body_content|safe }}
                                     </div>
+                                    <div class="footer"
+                                         style="padding-top: 15px; border-top: 1px solid black; margin-top: 30px">
+                                        <p><i>Insert a paragraph here that says whatever necessary to avoid any copyright and legal issues</i></p>
+                                    </div>
                                 </div>
-                                <div id="article-main-margin-2" class="col-sm-1 col-md-2"></div>
+                                <div id="article-main-margin-2" class="col-lg-2"></div>
                             </div>
                         </div>
                     </div>
@@ -53,38 +49,36 @@
 
         <!-- Sidebar -->
         <div id="sidebar-wrapper">
+            <a href="#menu-toggle" class="menu-toggle" style="text-decoration:none;">
             <div class="toggle-button">
-                <a href="#menu-toggle" class="menu-toggle" style="text-decoration:none;"> motif </a>
-                <p>&nbsp</p>
+                <img src="{{MEDIA_URL}}images/element/banana.jpg"
+                     style="height: 80px; padding-left: 0; border-radius: 10px">
             </div>
+            </a>
             <!-- star rating section -->
             <div class="card article-read-user-info">
                 <div class="card-block">
                     <div class="row">
-                        <div class="overall-rating col-md-6">
-                            <div class="creative-rating">4/5</div>
-                            <div class="informative-rating">4/5</div>
+                        <div class="overall-rating col-6">
+                            <div class="Overall">{{ ratings|find_avg_c:article.id }}<span class="rating-note">/{{ ratings|find_number_of_rating:article.id }}</span></div>
                         </div>
-                        <div class="user-rating col-md-6">
+                        <div class="user-rating col-6">
                             <!-- rating submission -->
                             <a href="#" class="" data-toggle="modal" data-target="#myModal">
                                 <div class="edit-rating-wrapper">
                                     {% if storage_entry.rating_c %}
                                     <div class="creative-rating"> {{ storage_entry.rating_c }}</div>
-                                    <div class="informative-rating">{{ storage_entry.rating_i }}
-                                    </div>
                                     {% else %}
-                                    <div class="creative-rating">Rate this</div>
-                                    <div class="creative-rating">Article</div>
+                                    <div class="creative-rating">Rate It</div>
                                     {% endif %}
                                 </div>
                             </a>
                         </div>
                         <div class="rating-explain col-md-6">
-                            <div class="number-of-rating">1,923</div>
+                            <div class="number-of-rating">Total</div>
                         </div>
                         <div class="rating-explain col-md-6">
-                            <div class="user-rating-explain">Yours</div>
+                            <div class="user-rating-explain">You</div>
                         </div>
                     </div>
                 </div>
@@ -97,9 +91,12 @@
 
                 <!-- Your summary -->
                 <div class="card-block">
+                    <p id="user-summary">
                     {% if storage_entry.summary %}
-                    <p id="user-summary">{{ storage_entry.summary }}</p>
+                        {{ storage_entry.summary }}
+                    </p>
                     {% else %}
+                    </p>
                     <button id="summarize-button" class="btn btn-primary">Summarize</button>
                     {% endif %}
                     <!-- summary form here -->
@@ -178,133 +175,7 @@
         <!-- /#sidebar-wrapper -->
     </div>
 </div>
-
 {% include 'motifapp/star_rating_template.html' %}
 
-<script>
-    function goBack() {
-        window.history.back()
-    }
-
-
-    $(document).ready(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-    });
-
-    //rating form
-    $('a[rel=popover]').popover({
-        html: 'true',
-        placement: 'top'
-    })
-
-    // toggle button here
-    $(".menu-toggle").click(function (e) {
-        e.preventDefault();
-        $("#wrapper").toggleClass("toggled");
-        $("#article-main").toggleClass("col-md-8");
-        $("#article-main-margin-1").toggleClass("col-md-2");
-        $("#article-main-margin-2").toggleClass("col-md-2");
-    });
-
-    //show/hide summary form
-    $('#summarize-form').hide();
-    $(document).ready(function () {
-        $("#summarize-button").click(function () {
-            console.log("click sum button!!!!");
-            $('#summarize-form').show();
-            $("#summarize-button").hide();
-        });
-    });
-
-    // summary form close button
-    $(document).ready(function () {
-        $("#summarize-close-button").click(function () {
-            $('#user-summary').show();
-            $("#summarize-button").show();
-            $('#summarize-form').hide();
-            $('#summary-edit-footer').show();
-        });
-    });
-
-    // sumamry edit button
-    $(document).ready(function () {
-        $("#summarize-edit-button").click(function () {
-            $('#summarize-form').show();
-            $('#user-summary').hide();
-            $('#summary-edit-footer').hide();
-        });
-    });
-
-    //summary form submission
-    $(document).on('submit', '#summarize-form', function (e) {
-        e.preventDefault();
-        $.ajax({
-            type: 'POST',
-            url: "summary_edit/",
-            data: {
-                summary: $('#summary').val(),
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-            },
-            success: function (response) {
-                var update_summary;
-                console.log('whats going on here..');
-                $('#summarize-form').hide();
-                $('#user-summary').html(response['update_summary']);
-                $('#user-summary').show();
-                $('#summary-edit-footer').show();
-            }
-        });
-    });
-
-    //add article from discover article view
-    $(document).on('submit', '#summarize-form', function (e) {
-        e.preventDefault();
-        $.ajax({
-            type: 'POST',
-            url: "summary_edit/",
-            data: {
-                summary: $('#summary').val(),
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-            },
-            success: function (response) {
-                console.log('sent');
-            }
-        });
-    });
-
-    // change font+
-    $("#font-minus").click(function (e) {
-        e.preventDefault();
-        $.ajax({
-            type: 'POST',
-            url: "theme_edit/",
-            data: {
-                'font_size': 'minus',
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-            },
-            success: function (response) {
-                $(".article-content").css("font-size", response['font_size']);
-            }
-        });
-    });
-
-    // change font-
-    $("#font-plus").click(function (e) {
-        e.preventDefault();
-        $.ajax({
-            type: 'POST',
-            url: "theme_edit/",
-            data: {
-                'font_size': 'plus',
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-            },
-            success: function (response) {
-                $(".article-content").css("font-size", response['font_size']);
-            }
-        });
-    });
-
-
-</script>
 {% endblock %}
 

@@ -7,31 +7,25 @@
     {% load staticfiles %}
     {% load motifapp_extra %}
     <!--Bootstrap 4-->
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.2.0.js" integrity="sha256-wPFJNIFlVY49B+CuAIrDr932XSb6Jk3J1M22M3E2ylQ=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
-    <script src="{% static 'el-pagination/js/el-pagination.js' %}"></script>
+    <!--<script src="{% static 'el-pagination/js/el-pagination.js' %}"></script>-->
     <script src= "{% static 'js/masonry.pkgd.min.js' %}"></script>
-
-
 
     <!--font awesome -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
     {% load static %}
+    <link rel="shortcut icon" type="image/png" href="{%  static 'favicon-32x32.png' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'stylesheet/style.css' %}">
-
-    {% load compress %}
-    {% compress css %}
-    <link rel="stylesheet" type="text/x-scss" href="{% static 'stylesheet/main.scss' %}" />
-    {% endcompress %}
-    <link rel="stylesheet" type="text/css" href="{% static 'stylesheet/main.css' %}">
+    <script type="text/javascript" src= "{% static 'js/motif.js' %}"></script>
     <!-- END OF LOAD -->
 
 </head>
 <body>
-    <nav class="navbar navbar-toggleable-md navbar-inverse fixed-top bg-inverse navbar-custom">
+    <nav class="navbar navbar-toggleable-md fixed-top navbar-custom" style="background-color: #fefefe;">
 
         <!-- logo, discover button-->
         <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,10 +34,10 @@
         <a class="navbar-brand" href="{% url 'motifapp:index' %}">motif</a>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'motifapp:index' %}">Home <span class="sr-only">(current)</span></a>
+                <li class="{% block saved_active %}{% endblock %} nav-item">
+                    <a class=" nav-link" href="{% url 'motifapp:index' %}"> Saved <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item">
+                <li class="{% block discover %}{% endblock %} nav-item">
                     <a class="nav-link" href="{% url 'motifapp:discover' %}">Discover</a>
                 </li>
                 <!--<li class="nav-item">-->
@@ -72,10 +66,10 @@
                         {{ request.user }}
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">Message</a>
+                        <a class="dropdown-item" href="#">Activity (Not yet)</a>
                         <a class="dropdown-item" href="/profile/{{ user }}">Profile</a>
-                        <!--<div class="dropdown-divider"></div>-->
-                        <a class="dropdown-item" href="{% url 'motifapp:logout' %}">Logout</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'motifapp:logout' %}"><i class="fa fa-rocket" aria-hidden="true"></i> Logout</a>
                     </div>
                 </li>
             </ul>

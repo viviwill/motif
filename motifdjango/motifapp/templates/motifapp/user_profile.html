@@ -3,34 +3,78 @@
 {% block body %}
     <div class="container">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-12" style="border-bottom: 2px solid lightgray; padding: 15px; margin-bottom: 20px">
                 <div class="row">
-                    <div class="header" style="border-bottom: 2px solid dimgray">
+                    <div class="col-2">
+                        <img class ="profile-portrait rounded-circle" src="{{MEDIA_URL}}{{ user.socialprofile.user_portrait }}" class="user-portrait-lg">
+                    </div>
+                    <div class="col-10">
                         <h1>{{ user }}</h1>
-                        <img src="{{MEDIA_URL}}{{ user.socialprofile.user_portrait }}" class="user-portrait-lg">
-                    </div>
-                    <div class="col-md-6" style="border-bottom: 2px solid dimgray">
-                        <h2> {{ user.socialprofile.follows.all.count }} Following</h2>
-                    </div>
-                    <div class="col-md-6" style="border-bottom: 2px solid dimgray">
-                        <h2>{{ user.socialprofile.followed_by.all.count }} Followers</h2>
+                        <h4> {{ user.storage_set.all.count }} Articles Saved </h4>
+                        <h4> {{ user.storage_set.rating.all.count }} Ratings </h4>
+                        <h4> {{ user.storage_set.summary.all.count }} Summaries </h4>
                     </div>
                 </div>
             </div>
-
-            <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {% include 'motifapp/form_template.html' %}
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <button type="submit" class="btn btn-success">Submit</button>
+        </div>
+        <div class="row">
+            <div class="col-2" style="border-right: 2px solid lightgray;">
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link"> User</a>
+                    </li>
+                </ul>
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link"> User</a>
+                    </li>
+                </ul>
+                <ul class="nav nav-pills flex-column">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link"> User</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-9" style="padding-left: 50px;">
+                <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% include 'motifapp/form_template.html' %}
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-success">Submit</button>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
+
 
         </div>
+
+
+
+
     </div>
 {% endblock %}
+
+
+<form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% include 'motifapp/form_template.html' %}
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-success">Submit</button>
+        </div>
+    </div>
+</form>
+
+
+
+<div class="col-md-6" style="border-bottom: 2px solid dimgray">
+    <h2> {{ user.socialprofile.follows.all.count }} Following</h2>
+</div>
+<div class="col-md-6" style="border-bottom: 2px solid dimgray">
+    <h2>{{ user.socialprofile.followed_by.all.count }} Followers</h2>
+</div>
 
 <!--{% for user in user.socialprofile.follows.all %}-->
 <!--<p>{{ user.user.username }}</p>-->

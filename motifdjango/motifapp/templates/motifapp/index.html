@@ -1,8 +1,12 @@
 {% extends 'motifapp/base.html' %}
-{% load staticfiles %}
+<!--{% load staticfiles %}-->
 {% load motifapp_extra %}
+{% block saved_active %}active{% endblock %}
+
 
 {% block body %}
+
+
 <div class="container-fluid">
     <div class="row">
         <!--seartch tool-->
@@ -11,51 +15,69 @@
         <!-- article card starts here -->
         <div class="card-deck">
             {% for article in user_saved_article %}
-            <div class="col-sm-6 col-md-3" style="padding: 0px 8px 0;">
-                <a href="{{ article.id }}" class="article-thumb-link">
-                    <div class="card">
-                        <!-- article card image -->
+            <div class="col-md-12 col-lg-4 col-xl-3" style="padding: 0px 8px 0;">
+                <div class="card">
+                    <!-- article card image -->
+                    <a href="{{ article.id }}" class="article-thumb-link index-view-card">
                         <div class="lead-image">
                             <img class="card-img-top img-fluid" src="{{ article.lead_image_url }}">
-                            <p class="article-thumb-score">
-                                {% if article.storage__rating_i%}
-                                <i class="fa fa-lightbulb-o" aria-hidden="true">
-                                    {{ article.storage__rating_i }}</i>
-                                {% endif %}
-                            </p>
+                            {% if article.storage__rating_c%}
+                            <div class="article-thumb-corner-info">
+                                <div class="row">
+                                    <div class="article-thumb-corner-user">
+                                        <i class="fa fa-lightbulb-o" aria-hidden="true"></i>
+                                        {{article.storage__rating_c }}<span class="rating-note">/you</span>
+                                    </div>
+
+                                    <div class="article-thumb-corner-overall">
+                                        <i class="fa fa-lightbulb-o" aria-hidden="true"></i> {{ ratings|find_avg_c:article.id }}<span class="rating-note">/{{ ratings|find_number_of_rating:article.id }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
                         </div>
 
                         <!--article card info -->
                         <div class="card-block">
                             <h4 class="card-title">{{ article.title }}</h4>
-                            <small class="text-muted">{{ article.word_count|divide:200}} mins read | {{ article.domain|domain_shorten }} | {{ article.storage__add_date|date:"M j, y "}} </small>
+                            <small class="text-muted">{{ article.word_count|divide:200}} mins read |
+                                {{ article.domain|domain_shorten }} |
+                                {{article.storage__add_date|date:"M j, y "}}
+                            </small>
                         </div>
-                        <div class="card-block">
-                            {% if article.storage__summary is None %}
-                            <p><i>Saved on: {{ article.storage__add_date|date:'N j, o' }}</i></p>
-                            {% else %}
-                            <p class="summary-date"><i><span>Summed on: {{ article.storage__summary_modified_date|date:'N j, o' }}</span></i>
-                            </p>
-                            {% endif %}
-                            <form action="{% url 'motifapp:article_delete' article.id %}"
-                                  method="post" style="display: inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="article_id" value="{{ article.id }}"/>
-                                <button type="submit" class="btn btn-default btn-sm">
+                    </a>
+                    <div class="card-footer index">
+                        <div class="row">
+                            <div class="col-8">
+                                {% if article.storage__summary_modified_date is not None %}
+                                <i class="fa fa-pencil " aria-hidden="true"></i>
+                                {{ article.storage__summary_modified_date|naturaltime}}
+                                {% endif %}
+                            </div>
+                            <div class="col-2 privacy-setting">
+                                {% if article.storage__public is True%}
+                                <a href="{% url 'motifapp:article_public_edit' article.id %}" class="article-public-edit public-edit-{{article.id}}">
+                                    <i class="fa fa-eye" aria-hidden="true"></i></a>
+                                {% else %}
+                                <a href="{% url 'motifapp:article_public_edit' article.id %}" class="article-public-edit public-edit-{{article.id}}"><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
+                                {% endif %}
+                            </div>
+                            <div class="col-2">
+                                <form action="{% url 'motifapp:article_delete' article.id %}"
+                                      method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="article_id"
+                                           value="{{ article.id }}"/>
                                     <i class="fa fa-trash-o" aria-hidden="true"></i>
-                                </button>
-                            </form>
-
-                            <!--<a href="{% url 'motifapp:article_delete' article.id %}">-->
-                            <!--<i class="fa fa-trash-o" aria-hidden="true"></i>-->
-                            <!--</a>-->
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </a>
+                </div>
             </div>
             {% endfor %}
         </div>
     </div>
 </div>
-{% endblock %}
 
+{% endblock %}

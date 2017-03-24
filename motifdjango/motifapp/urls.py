@@ -13,10 +13,12 @@ urlpatterns = [
     url(r'^logout/$', views.logout_user, name='logout'),
     url(r'^profile/(?P<slug>[\w.@+-]+)/$', views.UserProfile.as_view(), name='user_profile'),
 
-    # diffeent views
+    # discover views
     url(r'^discover/$', views.DiscoverView.as_view(), name='discover'),
     url(r'^discover/(?P<article_id>[0-9]+)/$', views.article_read, name='article_read'),
     url(r'^discover/(?P<article_id>[0-9]+)/theme_edit/$', views.article_edit_theme, name='article_edit_theme'),
+    url(r'^discover/(?P<article_id>[0-9]+)/article_storage_edit/$', views.article_storage_edit, name='article_storage_edit'),
+\
 
     # individual article page
     url(r'^(?P<article_id>[0-9]+)/$', views.article_read, name='article_read'),
@@ -28,5 +30,6 @@ urlpatterns = [
     url(r'^(?P<article_id>[0-9]+)/summary_delete/$', views.summary_delete, name='summary_delete'),
     url(r'^(?P<article_id>[0-9]+)/rating_edit/$', views.rating_edit, name='rating_edit'),
     url(r'^(?P<article_id>[0-9]+)/article_delete/$', views.article_delete, name='article_delete'),
+    url(r'^(?P<article_id>[0-9]+)/article_public_edit/$', views.article_public_edit, name='article_public_edit'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

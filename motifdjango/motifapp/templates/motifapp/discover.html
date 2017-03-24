@@ -1,23 +1,28 @@
 {% extends 'motifapp/base.html' %}
 {% load staticfiles %}
 {% load motifapp_extra %}
+{% block discover %}active{% endblock %}
+
 
 {% block body %}
 <div class="container-fluid">
     <!--<ul class="grid effect-2" id="grid">-->
     <div class="row masonry-container">
         {% for article in following_saved_article %}
-        <div class="col-sm-6 col-md-3 item" style="padding: 0px 8px 0;">
+        <div class="col-md-12 col-lg-4 col-xl-3 item" style="padding: 0px 8px 0;">
             <a href="{{ article.id }}" class="article-thumb-link">
                 <div class="card">
                     <img class="card-img-top img-fluid" src="{{ article.lead_image_url }}"
                          alt="Card image cap">
-                    <p class="article-thumb-score">
+                    <div class="article-thumb-corner-info">
                         {% if ratings|find_avg_c:article.id is not None%}
-                        <i class="fa fa-lightbulb-o" aria-hidden="true">
-                            {{ ratings|find_avg_c:article.id }}</i>
+                        <div class="row">
+                            <div class="article-thumb-corner-overall">
+                                <i class="fa fa-lightbulb-o" aria-hidden="true"></i> {{ ratings|find_avg_c:article.id }}<span class="rating-note">/{{ ratings|find_number_of_rating:article.id }}</span>
+                            </div>
+                        </div>
                         {% endif %}
-                    </p>
+                    </div>
 
                     <div class="card-block">
                         <h4 class="card-title">{{ article.title }}</h4>
@@ -35,18 +40,13 @@
                                         <img src="{{MEDIA_URL}}{{ x.user.socialprofile.user_portrait }}"
                                              class="summary-portrait rounded-circle">
                                     </div>
-                                    <div class="col-5 discover-user-and-date">
+                                    <div class="col-6 discover-user-and-date">
                                         <p>{{ x.user }}</p>
                                         <p>{{ x.add_date|naturaltime}}</p>
                                     </div>
-                                    <div class="col-2 discover-rating">
+                                    <div class="col-3 discover-rating">
                                         {% if x.rating_c is not None %}
                                         <i class="fa fa-lightbulb-o" aria-hidden="true">&nbsp{{x.rating_c|floatformat}}</i>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-2 discover-rating">
-                                        {% if x.rating_c is not None %}
-                                        <i class="fa fa-book" aria-hidden="true">&nbsp{{x.rating_i|floatformat}}</i>
                                         {% endif %}
                                     </div>
                                 </div>
