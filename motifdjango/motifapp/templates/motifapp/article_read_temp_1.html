@@ -1,0 +1,38 @@
+<div id="page-content-wrapper">
+    <div class="container-fluid no-padding">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="article-wrapper">
+                    <!--article body -->
+                    <div class="row">
+                        <div id="article-main-margin-1" class="col-lg-2"></div>
+                        <div class="article-main col-lg-8 col-md-12" id="article-main">
+                            <div class="article-header">
+                                <div class="article-title" id="article-title">
+                                    <h1 class="article-title">{{ article.title }} </h1>
+                                </div>
+                                <div class="row source-description">&nbsp&nbsp&nbsp&nbsp&nbsp
+                                    {% if article.author is not None %}
+                                    <p>by {{ article.author }},&nbsp</p>
+                                    {% endif %}
+                                    <a href="{{ article.web_url }}" target="_blank">
+                                        {{ article.domain}}
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="article-content"
+                                 style="font-size: {{request.user.socialprofile.theme_font_size}}rem;">
+                                {{ article.body_content|safe }}
+                            </div>
+                            <div class="footer"
+                                 style="padding: 10px; border-top: 1px solid black; margin-top: 30px">
+                                <p><i>Insert a paragraph here that says whatever necessary to avoid any copyright and legal issues</i></p>
+                            </div>
+                        </div>
+                        <div id="article-main-margin-2" class="col-lg-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

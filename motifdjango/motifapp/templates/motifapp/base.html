@@ -3,6 +3,8 @@
 <head>
     <title>{% block title %}Motif{% endblock %}</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
 
     {% load staticfiles %}
     {% load motifapp_extra %}
@@ -11,8 +13,16 @@
     <script src="https://code.jquery.com/jquery-3.2.0.js" integrity="sha256-wPFJNIFlVY49B+CuAIrDr932XSb6Jk3J1M22M3E2ylQ=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js
+"></script>
     <!--<script src="{% static 'el-pagination/js/el-pagination.js' %}"></script>-->
     <script src= "{% static 'js/masonry.pkgd.min.js' %}"></script>
+
+
+    <!-- include summernote css/js-->
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css" rel="stylesheet">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.js"></script>
+
 
     <!--font awesome -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -25,56 +35,55 @@
 
 </head>
 <body>
-    <nav class="navbar navbar-toggleable-md fixed-top navbar-custom" style="background-color: #fefefe;">
+    {% if user.is_authenticated %}
+    {% include 'motifapp/feedback_form.html' %}
+    <nav class="fixed-top navbar-custom" style="background-color: #fefefe;">
+        <ul class="nav nav-pills float-left">
+            <li class="nav-item hidden-sm-down" style="margin-left:40px;">
+                <a class="nav-link" href="{% url 'motifapp:index' %}">motif</a>
+            </li>
+            <li class="{% block discover %}{% endblock %} nav-item">
+                <a class="nav-link hidden-sm-down" href="{% url 'motifapp:index' %}"> HOME </a>
+                <a class="nav-link hidden-md-up" href="{% url 'motifapp:index' %}"> motif </a>
+            </li>
+            <li class="{% block user_view %}{% endblock %} nav-item">
+                <a class=" nav-link" href="{% url 'motifapp:user_view' request.user %}"> YOURS <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="{% block idea_of_motif %}{% endblock %} nav-item">
+                <a class="nav-link" href="{% url 'motifapp:idea_of_motif' %}">
+                    <span class="hidden-sm-down"><i class="fa fa-lightbulb-o" aria-hidden="true"></i></span> IDEA
+                </a>
+            </li>
+        </ul>
 
-        <!-- logo, discover button-->
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <a class="navbar-brand" href="{% url 'motifapp:index' %}">motif</a>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav mr-auto">
-                <li class="{% block saved_active %}{% endblock %} nav-item">
-                    <a class=" nav-link" href="{% url 'motifapp:index' %}"> Saved <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="{% block discover %}{% endblock %} nav-item">
-                    <a class="nav-link" href="{% url 'motifapp:discover' %}">Discover</a>
-                </li>
-                <!--<li class="nav-item">-->
-                    <!--<a class="nav-link" href="#">Reader</a>-->
-                <!--</li>-->
-            </ul>
-
-            <!-- add article with web_url -->
-            <form class="form-inline mt-2 mt-md-0" role="form" method="post" value=""  autocomplete="off"
-                  action="{% url 'motifapp:article_add' %}" enctype="multipart/form-data">
-                {% csrf_token %}
-                <div class="form-group">
-                    <div class="col-sm-10">
-                        <input class="form-control" id="article_url" name="web_url" type="text" placeholder="Add url">
-                    </div>
+        <!-- right side button and logo -->
+        <ul class="navbar-nav float-right dropdown-menu-right">
+            <li class="nav-item dropdown {% block user_profile %}{% endblock %}">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    &nbsp
+                    <img src="{{MEDIA_URL}}{{ request.user.socialprofile.user_portrait }}" class="navbar-portrait rounded-circle" border="1">
+                    <span class="hidden-sm-down">{{ request.user }}</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="#">Activity(WIP)</a>
+                    <a class="dropdown-item" href="/profile/{{ request.user }}">Profile</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{% url 'motifapp:logout' %}"><i class="fa fa-rocket" aria-hidden="true"></i> Logout</a>
                 </div>
-                <button type="submit" class="btn btn-outline-success my-2 my-sm-0"> + </button>
-            </form>
+            </li>
+        </ul>
 
-            <!-- right side button and logo -->
-            <ul class="navbar-nav dropdown-menu-right">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        &nbsp
-                        <img src="{{MEDIA_URL}}{{ request.user.socialprofile.user_portrait }}" class="navbar-portrait rounded-circle" border="1">
-                        {{ request.user }}
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                        <a class="dropdown-item" href="#">Activity (Not yet)</a>
-                        <a class="dropdown-item" href="/profile/{{ user }}">Profile</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="{% url 'motifapp:logout' %}"><i class="fa fa-rocket" aria-hidden="true"></i> Logout</a>
-                    </div>
-                </li>
-            </ul>
-        </div>
+        <ul class="nav nav-pills float-right">
+            <div class="btn-group" style="margin:auto;">
+                <button type="button" class="btn btn-motif-1" data-toggle="modal" data-target="#base-add-url-modal">+ <span class="hidden-sm-down">Article</span></button>
+            </div>
+            &nbsp&nbsp&nbsp
+        </ul>
     </nav>
+    {% endif %}
+    {% csrf_token %}
+    {% include 'motifapp/base_add_url_form.html' %}
+
 {% block body %}
 {% endblock %}
 </body>

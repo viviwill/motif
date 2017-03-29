@@ -27,7 +27,9 @@ DEBUG = True
 # make sure to include the comma inside '[host, ]'
 ALLOWED_HOSTS = ['django-env.us-west-1.elasticbeanstalk.com',
                  'www.projectbananatree.com',
+                 'projectbananatree.com',
                  '127.0.0.1',
+                 'localhost:8000',
                  ]
 
 # Application definition

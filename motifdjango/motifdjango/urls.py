@@ -21,5 +21,5 @@ from django.conf.urls.static import static
 urlpatterns = [
     # start from home page
     url(r'', include('motifapp.urls')),
-    url(r'^admin/', admin.site.urls),
+    url(r'^admin/admin/', admin.site.urls),
 ]

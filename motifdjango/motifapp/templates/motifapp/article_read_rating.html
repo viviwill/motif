@@ -1,0 +1,25 @@
+{% load motifapp_extra %}
+
+<div class="row" id="article-read-rating">
+    <div class="overall-rating col-6">
+        <div class="Overall">{{ ratings|find_avg_c:article.id }}<span class="rating-note">/{{ ratings|find_number_of_rating:article.id }}</span></div>
+    </div>
+    <div class="user-rating col-6">
+        <!-- rating submission -->
+        <a href="#" class="" data-toggle="modal" data-target="#myModal">
+            <div class="edit-rating-wrapper">
+                {% if storage_entry.rating_c %}
+                <div class="creative-rating"> {{ storage_entry.rating_c }}</div>
+                {% else %}
+                <div class="creative-rating">Rate It</div>
+                {% endif %}
+            </div>
+        </a>
+    </div>
+    <div class="rating-explain col-6">
+        <div class="number-of-rating">Total</div>
+    </div>
+    <div class="rating-explain col-6">
+        <div class="user-rating-explain">You</div>
+    </div>
+</div>

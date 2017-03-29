@@ -1,5 +1,6 @@
 {% extends 'motifapp/base.html' %}
 
+
 {% block body %}
     <div class="container">
         <div class="row">
@@ -21,21 +22,23 @@
             <div class="col-2" style="border-right: 2px solid lightgray;">
                 <ul class="nav nav-pills flex-column">
                     <li class="nav-item">
-                        <a href="#" class="nav-link"> User</a>
+                        <a href="#" class="nav-link"> Profile </a>
                     </li>
                 </ul>
                 <ul class="nav nav-pills flex-column">
                     <li class="nav-item">
-                        <a href="#" class="nav-link"> User</a>
+                        <a href="#" class="nav-link"> Followings </a>
                     </li>
                 </ul>
                 <ul class="nav nav-pills flex-column">
                     <li class="nav-item">
-                        <a href="#" class="nav-link"> User</a>
+                        <a href="#" class="nav-link"> Followers </a>
                     </li>
                 </ul>
             </div>
+
             <div class="col-9" style="padding-left: 50px;">
+                <p> WIP, can only upload portrait right now ... </p>
                 <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     {% include 'motifapp/form_template.html' %}
@@ -46,13 +49,7 @@
                     </div>
                 </form>
             </div>
-
-
         </div>
-
-
-
-
     </div>
 {% endblock %}
 

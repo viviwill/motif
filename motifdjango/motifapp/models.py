@@ -55,3 +55,17 @@ class SocialProfile(models.Model):
     def __str__(self):
         """Return human-readable representation"""
         return self.user.username
+
+
+class Invite(models.Model):
+    invite_code = models.CharField(max_length=50, null=True)
+    invite_code_given = models.BooleanField(default=False)
+    invite_username = models.CharField(max_length=50, null=True)
+    used_date = models.DateTimeField('dated used', default=None)
+
+
+class Feedback(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    url = models.TextField(blank=True, null=True)
+    message = models.TextField(blank=True, null=True)
+

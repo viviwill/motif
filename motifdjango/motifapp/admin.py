@@ -1,10 +1,14 @@
 from django.contrib import admin
+from datetime import date
+from django.utils.translation import ugettext_lazy as _
+
+
 
 from .models import *
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'username', 'email', 'date_joined','last_login')
+    list_display = ('id', 'username', 'email', 'date_joined', 'last_login')
 
 
 admin.site.unregister(User)
@@ -17,14 +21,24 @@ class ArticleAdmin(admin.ModelAdmin):
 
 
 class StorageAdmin(admin.ModelAdmin):
-    list_display = ('user', 'article', 'add_date', "rating_c", 'summary')
+    list_display = ('user', 'article', 'public', 'add_date', "rating_c", 'summary')
 
 
 class SocialprofileAdmin(admin.ModelAdmin):
     model = SocialProfile.follows.through
 
 
+class InviteAdmin(admin.ModelAdmin):
+    list_display = ('invite_code', 'invite_code_given', 'invite_username', 'used_date')
+
+
+class FeedbackAdmin(admin.ModelAdmin):
+    list_display = ('user', 'url', 'message')
+
+
 # Models that listed in admin
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Storage, StorageAdmin)
 admin.site.register(SocialProfile, SocialprofileAdmin)
+admin.site.register(Invite, InviteAdmin)
+admin.site.register(Feedback, FeedbackAdmin)

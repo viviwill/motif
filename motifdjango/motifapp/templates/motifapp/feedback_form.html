@@ -1,0 +1,28 @@
+<button type="button" class="btn btn-motif-2" data-toggle="modal"
+        data-target="#leave-feedback-form" id ="leave-feedback-form-button">Feedback</button>
+
+<div class="modal fade" id="leave-feedback-form" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <textarea class="form-control" id="feedback-url" rows="1" disabled>{{ request.build_absolute_uri }}</textarea>
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" id="feedback-message" rows="6"
+                              placeholder="You can report a problem here, or just let me know what you think. Anything at all. Thank you."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                {% csrf_token %}
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-motif-2" id="feedback-submit" data-dismiss="modal">Send</button>
+            </div>
+        </div>
+    </div>
+</div>

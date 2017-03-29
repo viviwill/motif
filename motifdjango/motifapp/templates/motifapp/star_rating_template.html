@@ -7,17 +7,17 @@
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header" style="padding: 3px 15px 3px;">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <button type="button" class="close" id="rating-form-close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="creative-star-rating">
-                    <form role="form" method="post"
+                    <form id="rating-form" role="form" method="post"
                           action="{% url 'motifapp:rating_edit' article.id %}"
-                          enctype="multipart/form-data">{% csrf_token %}
+                          enctype="multipart/form-data">
                         <div class="row">
                             <div class="col-10">
                                 {% for i in "xxxxxxxxxx" %}
-                                <input class="star creative-star-{{ 11|sub:forloop.counter }}"
+                                <input class="star creative-star"
                                        id="creative-star-{{ 11|sub:forloop.counter }}" type="radio"
                                        value={{ 11|sub:forloop.counter }} name="creative-star"/>
                                 <label class="star creative-star-{{ 11|sub:forloop.counter }}"
@@ -25,7 +25,7 @@
                                 {% endfor %}
                             </div>
                             <div class="col-2">
-                                <button type="submit" class="btn btn-primary" style="margin-top:8px">
+                                <button type="submit" class="btn btn-motif-1" style="margin-top:8px">
                                     rate</button>
                             </div>
                         </div>

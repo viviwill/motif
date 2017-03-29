@@ -4,8 +4,10 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Avg
+from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -23,11 +25,15 @@ import os
 from crawler import motif_crawler
 
 
+import requests
+from django.http import HttpResponse
+
+
 # Homepage(index) list view
 @method_decorator(login_required, name='dispatch')
-class IndexView(generic.ListView):
+class UserView(generic.ListView):
     # load the templates variable
-    template_name = 'motifapp/index.html'
+    template_name = 'motifapp/user_view.html'
     context_object_name = 'article_list'
 
     def get_queryset(self):
@@ -36,15 +42,31 @@ class IndexView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         # create a context list here
-        context = super(IndexView, self).get_context_data(**kwargs)
+        context = super(UserView, self).get_context_data(**kwargs)
 
-        # list of different context starts here, then return to use in views
-        user = self.request.user
-        context['user'] = self.request.user
+        user = User.objects.get(username=self.kwargs['slug'])
+        if user == self.request.user:
+            context['is_login_user'] = True
+            article_list = Article.objects.filter(storage__user=user.id).order_by(
+                '-storage__add_date')
+        else:
+            # if it's not login user, filter out the private list
+            context['is_login_user'] = False
+            # !!!!!!!!!!!!!! be really fucking careful when you chaining filter
+            article_list = Article.objects.filter(storage__public=True,
+                                                  storage__user=user.id).order_by(
+                '-storage__add_date')
 
+        # check if following the user
+        if not self.request.user.socialprofile.follows.filter(user=user.id):
+            context['is_following'] = False
+        else:
+            context['is_following'] = True
+
+        context['user'] = user
         # user saved article list
-        article_list = Article.objects.filter(storage__user=user.id).order_by('-storage__add_date')
-        context['user_saved_article'] = article_list.values('id', 'title', 'lead_image_url',
+        context['user_saved_article'] = article_list.values('id', 'title', 'body_content',
+                                                            'lead_image_url',
                                                             'domain', 'word_count',
                                                             'storage__add_date',
                                                             'storage__summary',
@@ -56,6 +78,15 @@ class IndexView(generic.ListView):
             total_rated=Count('storage__user'),
             avg_c=Avg('storage__rating_c'))
         context['ratings'] = ratings
+
+        # context['rating_stats'] = Storage.objects.annotate(
+        #     number_of_rating=Count('rating_c'), number_of_summary=Count('summary')).values_list(
+        #     'number_of_rating', 'number_of_summary')
+        context['number_of_rating'] = Article.objects.filter(storage__user=user,
+                                                             storage__rating_c__isnull=False).count()
+        context['number_of_summary'] = Article.objects.filter(storage__user=user,
+                                                              storage__summary__isnull=False).count()
+
         return context
 
 
@@ -91,26 +122,42 @@ class DiscoverView(generic.ListView):
         followings = user.socialprofile.follows.all()
         followings_list = list(followings.values_list('user', flat=True).order_by('user'))
 
-        # get all article following saved with distinct, prefetch to eliminate unfollow data
-        distinct_saved = Article.objects.filter(
-            storage__user__in=followings_list).distinct().order_by('-add_date')
+        # get all public articles saved by follows
+        public_saved = Article.objects.filter(
+            storage__user__in=followings_list).filter(storage__public=True)
+
+        # filter out duplicates
+        distinct_saved = public_saved.distinct().order_by('-add_date')
+
+        # prefetch to eliminate unfollow data
         following_saved_article = distinct_saved.prefetch_related(
             models.Prefetch('storage_set', queryset=Storage.objects.filter(
-                user__in=followings_list), to_attr='storage_from_followings'))
+                user__in=followings_list).filter(public=True), to_attr='storage_from_followings'))
+
         context['following_saved_article'] = following_saved_article
 
         # rating
         distinct_saved_list = distinct_saved.values_list('id', flat=True).order_by('id')
-        ratings = Article.objects.filter(id__in=distinct_saved_list).filter(storage__rating_c__isnull=False).annotate(
+        ratings = Article.objects.filter(id__in=distinct_saved_list).filter(
+            storage__rating_c__isnull=False).annotate(
             total_rated=Count('storage__user'),
             avg_c=Avg('storage__rating_c'))
         context['ratings'] = ratings
         return context
 
 
+def idea_of_motif(request):
+    print "idea page here"
+
+    return render(request, 'motifapp/idea_of_motif.html')
+
+
 # individual article display view
 @login_required
-def article_read(request, article_id):
+def article_read(request, article_id, **kwargs):
+    # article_id = kwargs['article_id']
+
+    # print "slug here", kwargs['slug']
     user = request.user
     storage_entry = None
 
@@ -172,38 +219,71 @@ def summary_delete(request, article_id):
 
 # edit rating
 def rating_edit(request, article_id):
-    if request.method == "POST":
-        user_storage = Storage.objects.filter(user_id=request.user).get(article_id=article_id)
-        c_rating = request.POST.get('creative-star')
-        i_rating = request.POST.get('informative-star')
-        print "POST creative rating: ", c_rating
-        print "POST informative rating: ", i_rating
-
+    if request.method == "POST" and request.is_ajax():
         # update the score
+        user = request.user
+        user_storage = Storage.objects.filter(user_id=request.user).get(article_id=article_id)
+        c_rating = request.POST['creative_star']
         if c_rating is not None:
             user_storage.rating_c = c_rating
-        if i_rating is not None:
-            user_storage.rating_i = i_rating
-        user_storage.save()
-        return redirect('motifapp:article_read', article_id)
+            user_storage.save()
+
+        art_temp = Article.objects.filter(id=article_id).filter(storage__rating_c__isnull=False)
+        ratings = art_temp.annotate(total_rated=Count('storage__user'),
+                                    avg_c=Avg('storage__rating_c'))
+        try:
+            storage_entry = Storage.objects.filter(user_id=user).get(article_id=article_id)
+        except ObjectDoesNotExist:
+            pass
+        article = get_object_or_404(Article, pk=article_id)
+
+        return render(request, 'motifapp/article_read_rating.html', locals())
 
 
 # add article
 def article_add(request):
     if request.method == "POST":
         print "Add article with url"
-        web_url = request.POST['web_url']
-        article_crawl = motif_crawler.Uploadarticle(str(web_url))
-        article_crawl.sql_upload()
-
-        # update storage
-        target_id = article_crawl.get_article_id()
-        check = Storage.objects.filter(article_id=target_id).filter(user=request.user).count()
-        if check == 0:
-            s = Storage(article_id=target_id, user=request.user, add_date=timezone.now())
-            s.save()
+        web_url = request.POST['article_url']
+        if request.POST['private'] == 'false':
+            public = True
         else:
-            print "Article exsited in user storage"
+            public = False
+
+        # call crawler
+        article_crawl = motif_crawler.Uploadarticle(str(web_url))
+
+        # 1) use sql to direct upload, with so much ascii shit going on
+        # article_crawl.sql_upload()
+        # target_id = article_crawl.get_article_id()
+
+        # 2) use django api to create new instance
+        article_value = article_crawl.sql_query_value
+        # query_value = [title, author, web_url, lead_image_url, domain,
+        #                body_content_string, pub_date, add_date, word_count]
+        check_article = Article.objects.filter(web_url=article_value[2]).count()
+        if check_article == 0:
+            print "Article doesn't exist, add"
+            new_article = Article(title=article_value[0], author=article_value[1],
+                                  web_url=article_value[2], lead_image_url=article_value[3],
+                                  domain=article_value[4], body_content=article_value[5],
+                                  pub_date=article_value[6], add_date=article_value[7],
+                                  word_count=article_value[8])
+            new_article.save()
+        else:
+            print "Article existed"
+        target_id = Article.objects.get(web_url=article_value[2]).id
+
+        # check if the article existed, then update storage
+        check_storage = Storage.objects.filter(article_id=target_id).filter(
+            user=request.user).count()
+        if check_storage == 0:
+            print "Stroage doesn't exist, add article to storage"
+            new_storage = Storage(article_id=target_id, user=request.user,
+                                  add_date=timezone.now(), public=public)
+            new_storage.save()
+        else:
+            print "Storage exist for user"
         return redirect('motifapp:index')
 
 
@@ -211,7 +291,7 @@ def article_add(request):
 def article_storage_edit(request, article_id):
     print "edit article storage setting for: ", article_id
     if request.method == "POST":
-        user=request.user
+        user = request.user
         try:
             storage_entry = Storage.objects.filter(user_id=user).get(article_id=article_id)
             storage_entry.delete()
@@ -239,7 +319,20 @@ def article_edit_theme(request, article_id):
         return JsonResponse({'font_size': str(profile.theme_font_size) + 'rem'})
 
 
-# =============== User register/login/logout ===================
+def feedback_submit(request):
+    if request.method == "POST":
+        print "Feedback submit"
+        feedback_url = request.POST['feedback_url']
+        feedback_message = request.POST['feedback_message']
+        user = request.user
+
+        print "urlhere:", feedback_url
+
+        Feedback(user=user, url=feedback_url, message=feedback_message).save()
+        return JsonResponse({'message': 'Thank you!'})
+
+
+# =============== User register/login/logout (NOT IN USE!!) ===================
 class UserFormView(View):
     form_class = UserForm
     templates_name = 'motifapp/registration_form.html'
@@ -275,6 +368,73 @@ class UserFormView(View):
 
         # if user didn't login, here is the form to try again
         return render(request, self.templates_name, {'form': form})
+
+
+def register_user(request):
+    print "user registration"
+    if request.user.is_authenticated():
+        return redirect('motifapp:index')
+
+    elif request.method == 'POST':
+        invite_code = request.POST['invite_code']
+        # if Invite.objects.filter(invite_code_given=False).filter(invite_code=invite_code).count()==0:
+        if invite_code != 'lobster':
+            return render(request, 'motifapp/registration_form.html',
+                          {'error_message': 'Invalid invite code'})
+
+        if User.objects.filter(username=request.POST['username']).count() != 0:
+            return render(request, 'motifapp/registration_form.html',
+                          {'error_message': 'Username taken'})
+
+        if request.POST['username'].isdigit():
+            return render(request, 'motifapp/registration_form.html',
+                          {'error_message': 'Username cannot be just number'})
+
+        form = UserForm(request.POST)
+        if form.is_valid():
+            print "form is valid"
+            form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            email = form.cleaned_data['email']
+
+            print username, password, email
+
+            user = form.save(commit=False)
+            user.set_password(password)
+            user.save()
+            SocialProfile.objects.get_or_create(user=user)
+            profile = SocialProfile.objects.get(user=user)
+            profile.user_portrait = 'images/portrait/reading.jpg'
+            profile.save()
+
+            user = authenticate(username=username, password=password, email=email)
+            everybody_is_friend(user)
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return redirect('motifapp:index')
+
+    return render(request, 'motifapp/registration_form.html')
+
+
+def everybody_is_friend(target_user):
+    print "let", target_user, "friends up with everybody "
+    target_profile = target_user.socialprofile
+
+    # for row in target_profile.follows.all():
+    #     print "follows", row.user
+    # for row in target_profile.followed_by.all():
+    #     print "followed by", row.user
+
+    # get everybody but admin and itself
+    user_list = User.objects.exclude(username=target_user).exclude(username__icontains='admin')
+
+    # everyone follows new kid and vice versa
+    for row in user_list:
+        other_profile = row.socialprofile
+        target_profile.follows.add(other_profile)
+        other_profile.follows.add(target_profile)
 
 
 # Login View
@@ -347,3 +507,9 @@ class UserProfile(generic.DetailView, FormMixin):
             update_profile.save()
 
         return render(request, self.template_name, {'form': form})
+
+
+# testing view
+def testing_view(request):
+    variable = request.path
+    return render(request, 'motifapp/zzz_testing.html', {'variable': variable})

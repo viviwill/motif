@@ -9,59 +9,63 @@
     <!--<ul class="grid effect-2" id="grid">-->
     <div class="row masonry-container">
         {% for article in following_saved_article %}
-        <div class="col-md-12 col-lg-4 col-xl-3 item" style="padding: 0px 8px 0;">
-            <a href="{{ article.id }}" class="article-thumb-link">
-                <div class="card">
-                    <img class="card-img-top img-fluid" src="{{ article.lead_image_url }}"
-                         alt="Card image cap">
-                    <div class="article-thumb-corner-info">
-                        {% if ratings|find_avg_c:article.id is not None%}
-                        <div class="row">
-                            <div class="article-thumb-corner-overall">
-                                <i class="fa fa-lightbulb-o" aria-hidden="true"></i> {{ ratings|find_avg_c:article.id }}<span class="rating-note">/{{ ratings|find_number_of_rating:article.id }}</span>
-                            </div>
+        <div class="col-sm-12 col-md-6 col-lg-4 item" style="padding: 0px 10px 0;">
+            {% if ratings|find_avg_c:article.id is not None%}
+            <div class="card">
+                <a href="{{ article.id }}" class="article-thumb-link">
+                {% if article.lead_image_url %}
+                <img class="card-img-top img-fluid" src="{{ article.lead_image_url }}"
+                     alt="Card image cap">
+                {% endif %}
+                <div class="article-thumb-corner-info">
+                    {% if ratings|find_avg_c:article.id is not None%}
+                    <div class="row">
+                        <div class="article-thumb-corner-overall">
+                            <i class="fa fa-lightbulb-o" aria-hidden="true"></i> {{ ratings|find_avg_c:article.id }}<span class="rating-note">/{{ ratings|find_number_of_rating:article.id }}</span>
                         </div>
-                        {% endif %}
                     </div>
+                    {% endif %}
+                </div>
 
-                    <div class="card-block">
-                        <h4 class="card-title">{{ article.title }}</h4>
-                        <small class="text-muted">{{ article.word_count|divide:200}} mins read |
-                            {{article.domain|domain_shorten }} | {{ article.add_date|date:"M j, y "}}
-                        </small>
-                    </div>
-                    <div class="list-group list-group-flush">
-                        {% for x in article.storage_from_followings %}
-                        {% if x.rating_c is not None %}
-                        <div class="list-group-item">
-                            <div class="card-detail">
-                                <div class="row">
-                                    <div class="col-2">
-                                        <img src="{{MEDIA_URL}}{{ x.user.socialprofile.user_portrait }}"
-                                             class="summary-portrait rounded-circle">
-                                    </div>
-                                    <div class="col-6 discover-user-and-date">
-                                        <p>{{ x.user }}</p>
-                                        <p>{{ x.add_date|naturaltime}}</p>
-                                    </div>
-                                    <div class="col-3 discover-rating">
-                                        {% if x.rating_c is not None %}
-                                        <i class="fa fa-lightbulb-o" aria-hidden="true">&nbsp{{x.rating_c|floatformat}}</i>
-                                        {% endif %}
-                                    </div>
+                <div class="card-block">
+                    <h4 class="card-title">{{ article.title }}</h4>
+                    <small class="text-muted">{{ article.word_count|divide:200}} mins read |
+                        {{article.domain|domain_shorten }} | {{ article.add_date|date:"M j, y "}}
+                    </small>
+                </div>
+                </a>
+                <div class="list-group list-group-flush">
+                    {% for x in article.storage_from_followings %}
+                    {% if x.rating_c is not None %}
+                    <div class="list-group-item">
+                        <div class="card-detail">
+                            <div class="row">
+                                <div class="col-2">
+                                    <img src="{{ MEDIA_URL }}{{ x.user.socialprofile.user_portrait }}"
+                                         class="summary-portrait rounded-circle">
+                                </div>
+                                <div class="col-6 discover-user-and-date">
+                                    <p><a href="{{ x.user }}">{{ x.user }}</a></p>
+                                    <p>{{ x.add_date|naturaltime}}</p>
+                                </div>
+                                <div class="col-3 discover-rating">
+                                    {% if x.rating_c is not None %}
+                                    <i class="fa fa-lightbulb-o" aria-hidden="true">&nbsp{{x.rating_c|floatformat}}</i>
+                                    {% endif %}
                                 </div>
                             </div>
-                            {% if x.summary is not None %}
-                            <div class="discover-summary">
-                                <p>{{ x.summary }}</p>
-                            </div>
-                            {% endif %}
+                        </div>
+                        {% if x.summary is not None %}
+                        <div class="discover-summary">
+                            <p>{{ x.summary }}</p>
                         </div>
                         {% endif %}
-                        {% endfor %}
                     </div>
+                    {% endif %}
+                    {% endfor %}
                 </div>
-            </a>
+            </div>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
@@ -87,5 +91,4 @@
         itemSelector: '.item'
     });
 </script>
-
 {% endblock %}

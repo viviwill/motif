@@ -3,7 +3,7 @@
 <head>
     <title>{% block title %}Motif{% endblock %}</title>
     <meta charset="UTF-8">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {% load staticfiles %}
     {% load motifapp_extra %}
@@ -23,6 +23,12 @@
     <!--<script src="{% static 'el-pagination/js/el-pagination.js' %}"></script>-->
     <script src="{% static 'js/masonry.pkgd.min.js' %}"></script>
 
+
+    <!-- include summernote css/js-->
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css" rel="stylesheet">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.js"></script>
+
+
     <!--font awesome -->
     <link rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -35,33 +41,39 @@
 </head>
 <body>
 <nav class="navbar navbar-light navbar-article-read fixed-top" style="background-color: #fefefe;">
-        <div class="row">
-            <div class="col-4">
-                <div class="row">
-                    <a onclick="goBack()" href="#" style="margin-left:15px; margin-top: 5px">
-                        <i class="fa fa-arrow-circle-left fa-2x" aria-hidden="true"></i>
-                    </a>
-                    <button id="edit-article-storage" class="btn btn-primary"
-                            value="{{article.id}}"
-                            style="margin-left: 25px; margin-bottom: 5px;">
-                        {% if storage_entry %}SAVED
-                        {% else %}SAVE
-                        {% endif %}
-                    </button>
-                </div>
-            </div>
-            <div class="col-4"></div>
-            <div class="col-4">
-                <span class="pull-right">
-                    <button type="button" class="btn btn-primary">Theme</button>
-                    <div class="btn-group mr-2" role="group" aria-label="First group">
-                        <button type="button" id="font-minus" class="btn btn-secondary">A-</button>
-                        <button type="button" id="font-plus" class="btn btn-secondary">A+</button>
-                    </div>
-                </span>
+    <div class="row">
+        <div class="col-6">
+            <div class="row">
+                <button type="button" class="btn btn-secondary" onclick="goBack()"
+                        style="margin-left: 25px; margin-bottom: 5px;"><i class="fa fa-arrow-circle-left" aria-hidden="true"></i>
+                </button>
+                {% if storage_entry %}
+                <button class="btn btn-secondary"
+                        style="margin-left: 5px; margin-bottom: 5px;" disabled>SAVED</button>
+                {% else %}
+                <button id="edit-article-storage" class="btn btn-motif-1"
+                        value="{{article.id}}"
+                        style="margin-left: 5px; margin-bottom: 5px;">SAVE</button>
+                {% endif %}
             </div>
         </div>
+        <div class="col-6">
+            <span class="pull-right">
+                <div class="btn-group mr-2 hidden-xs-down" role="group" aria-label="First group">
+                    <button type="button" class="btn btn-primary">
+                    <i class="fa fa-moon-o" aria-hidden="true"></i><span class="hidden-sm-down">Theme(WIP)</span></button>
+                    <button type="button" id="font-minus" class="font-minus btn btn-secondary" style="font-size: 0.8rem">A-</button>
+                    <button type="button" id="font-plus" class="font-plus btn btn-secondary">A+</button>
+                </div>
+
+                <button type="button" class="btn btn-motif-1 menu-toggle" value="hide">RATE</button>
+            </span>
+        </div>
+    </div>
 </nav>
+
+{% include 'motifapp/feedback_form.html' %}
+
 {% block body %}
 {% endblock %}
 </body>

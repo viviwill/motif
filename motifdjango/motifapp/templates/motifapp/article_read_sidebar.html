@@ -1,0 +1,97 @@
+{% load motifapp_extra %}
+<!-- star rating section -->
+<div class="card article-read-user-info">
+    <div class="card-block">
+        {% include "motifapp/article_read_rating.html" %}
+    </div>
+
+    <!--todo: explain the time cost thing-->
+    <div class="card-footer text-muted time-cost">
+        <h5>{{ reading_time }} mins read
+            <a href="#" data-toggle="tooltip"
+               title="Average readers reach around 200 words per minute with a typical comprehension of 60%."><span
+                    class="glyphicon glyphicon-question-sign"></span></a></h5>
+    </div>
+
+    <!-- Your summary -->
+    <div class="card-block">
+        <p id="user-summary">
+            {% if storage_entry.summary %}
+            {{ storage_entry.summary }}
+        </p>
+        {% else %}
+        </p>
+        <button id="summarize-button" class="btn btn-motif-1">Summarize</button>
+        {% endif %}
+        <!-- summary form here -->
+        <form id="summarize-form" role="form" method="post"
+              action="{% url 'motifapp:summary_edit' article.id %}"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="" style="padding-bottom: 10px;">
+                            <textarea class="form-control"
+                                      {% if not summary %}
+                                      placeholder="Summarize here"
+                                      {% endif %} rows="10"
+                                      id="summary" name="summary" type="text">{% if storage_entry.summary %}{{ storage_entry.summary }}{% endif %}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm"> Save</button>
+            &nbsp&nbsp
+            <button id="summarize-close-button" class="btn btn-primary btn-sm"
+                    type="button"> Close
+            </button>
+        </form>
+        <!-- summary form end -->
+    </div>
+    {% if storage_entry.summary %}
+    <div class="card-footer text-muted" id="summary-edit-footer">
+        <div class="row user-summary-edit-date">
+            <div class="col-5">
+                <button id="summarize-edit-button" class="btn btn-primary btn-sm"
+                        type="button"> Edit
+                </button>
+                &nbsp&nbsp
+                <a href="{% url 'motifapp:summary_delete' article.id %}"
+                   class="btn btn-primary btn-sm">Delete</a>
+            </div>
+            <div class="col-7">
+                <p>Last edit: {{ storage_entry.summary_modified_date|naturaltime }}</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <ul class="list-group list-group-flush">
+        {% for x in article.storage_from_followings %}
+        {% if x.summary is not None %}
+        <li class="list-group-item">
+            <div class="card-detail">
+                <div class="row">
+                    <div class="col-2">
+                        <img src="{{MEDIA_URL}}{{ x.user.socialprofile.user_portrait }}"
+                             class="summary-portrait rounded-circle">
+                    </div>
+                    <div class="col-6 discover-user-and-date">
+                        <p>{{ x.user }}</p>
+                        <p>{{ x.add_date|naturaltime}}</p>
+                    </div>
+                    <div class="col-2 discover-rating">
+                        {% if x.rating_c is not None %}
+                        <i class="fa fa-lightbulb-o" aria-hidden="true">&nbsp{{x.rating_c|floatformat}}</i>
+                        {% endif %}
+                    </div>
+                    <div class="col-2 discover-rating">
+                        {% if x.rating_c is not None %}
+                        <i class="fa fa-book" aria-hidden="true">&nbsp{{x.rating_i|floatformat}}</i>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <p>{{ x.summary }}</p>
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</div>

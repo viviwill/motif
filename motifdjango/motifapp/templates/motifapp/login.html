@@ -5,7 +5,7 @@
 
     <form class="form-signin" role="form" action="{% url 'motifapp:login' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <h2 class="form-signin-heading">Please sign in</h2>
+        <h2 class="form-signin-heading">Sign in</h2>
 
         <!--error message -->
         {% if error_message %}
@@ -21,7 +21,10 @@
                 <input type="checkbox" value="remember-me"> Remember me
             </label>
         </div>
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+        <div class="panel-footer">
+            <p>New? <a href="{% url 'motifapp:register' %}">Click here</a> to register</p>
+        </div>
+        <button class="btn btn-lg btn-motif-1 btn-block" type="submit">Sign in</button>
     </form>
 </div>
 

@@ -1,0 +1,33 @@
+<div class="jumbotron user_view_profile">
+    <div class="row">
+        <div class="col-sm-3 col-lg-2 hidden-sm-down">
+            <img class ="profile-portrait rounded-circle" src="{{MEDIA_URL}}{{ user.socialprofile.user_portrait }}">
+        </div>
+        <div class="col-sm-9 col-lg-9">
+            <h1><img class ="rounded-circle hidden-md-up" style="height:50px; width:50px"
+                     src="{{MEDIA_URL}}{{ user.socialprofile.user_portrait }}">  {{ user }}</h1>
+            <div class="col-12">
+                <div class="row">
+                    <div class="col-6">
+                        <h5>&nbsp</h5>
+                        <h5>{{ user.socialprofile.follows.all.count }} Followings </h5>
+                        {% if is_login_user %}
+                        <h5> {{ user.socialprofile.followed_by.all.count }} Followers </h5>
+                        {% else %}
+                        {% if is_following %}
+                        <button type="button" class="btn btn-secondary">Unfollow  |  {{ user.socialprofile.followed_by.all.count }} Followers </button>
+                        {% else %}
+                        <button type="button" class="btn btn-primary">Follow  |  {{ user.socialprofile.followed_by.all.count }} Followers </button>
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                    <div class="col-5" style="border-left: 2px solid lightgray; padding-left: 20px; margin-left: 10px">
+                        <h5> {{ user.storage_set.all.count }} Articles </h5>
+                        <h5> {{ number_of_rating }} Ratings </h5>
+                        <h5> {{ number_of_summary }} Summaries </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
