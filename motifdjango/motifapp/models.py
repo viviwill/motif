@@ -43,6 +43,9 @@ class Storage(models.Model):
         return '%s' % (self.article)
 
 
+
+
+
 # User following model
 class SocialProfile(models.Model):
     user = models.OneToOneField(User, unique=True)
