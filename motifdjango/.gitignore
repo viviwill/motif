@@ -5,4 +5,9 @@
 !.elasticbeanstalk/*.global.yml
 
 # portrait file
+/media/images/portrait
+/media/images/portrait/
+/media/images/portrait/*
 media/images/portrait
+media/images/portrait/
+media/images/portrait/*
