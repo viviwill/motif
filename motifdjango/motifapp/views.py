@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count, Avg
@@ -20,10 +21,10 @@ from .forms import *
 from .models import *
 
 import os
+import re
 
 # sys.path.append('/Users/viviwill/Desktop/motif/')
 from crawler import motif_crawler
-
 
 import requests
 from django.http import HttpResponse
@@ -132,7 +133,8 @@ class DiscoverView(generic.ListView):
         # prefetch to eliminate unfollow data
         following_saved_article = distinct_saved.prefetch_related(
             models.Prefetch('storage_set', queryset=Storage.objects.filter(
-                user__in=followings_list).filter(public=True), to_attr='storage_from_followings'))
+                user__in=followings_list).filter(public=True).order_by('-upvotes'),
+                            to_attr='storage_from_followings'))
 
         context['following_saved_article'] = following_saved_article
 
@@ -143,13 +145,59 @@ class DiscoverView(generic.ListView):
             total_rated=Count('storage__user'),
             avg_c=Avg('storage__rating_c'))
         context['ratings'] = ratings
+
+        # detect user interaction with summary
+        context['user_activity'] = Activity.objects.filter(user=user,
+                                                           vote_value=1).values_list(
+            'storage_interact', flat=True)
+        # for row in context['user_activity']:
+        #     print row
         return context
 
 
-def idea_of_motif(request):
-    print "idea page here"
+def activity(request):
+    user = request.user
+    activities = Activity.objects.filter(user=user)
+    return render(request, 'motifapp/activity.html', {'activities': activities})
 
-    return render(request, 'motifapp/idea_of_motif.html')
+
+def reset_summary_vote():
+    for storage in Storage.objects.all():
+        storage.upvotes = 0
+        storage.save()
+
+
+def upvote_summary(request):
+    if request.method == "POST":
+        storage_id = request.POST['storage_id']
+        print "Upvote Summary for storage:", storage_id
+        summary_storage = Storage.objects.get(id=storage_id)
+
+        try:
+            # if existed, update time, vote
+            act = Activity.objects.get(user=request.user, storage_interact=summary_storage,
+                                       type='UP')
+            act.activity_date = timezone.now()
+
+            if act.vote_value != 0:
+                summary_storage.upvotes -= 1
+                act.vote_value = 0
+            else:
+                summary_storage.upvotes += 1
+                act.vote_value = 1
+            summary_storage.save()
+            act.save()
+        except ObjectDoesNotExist:
+            act = Activity.objects.create(user=request.user, storage_interact=summary_storage,
+                                          type='UP',
+                                          activity_date=timezone.now())
+            summary_storage.upvotes += 1
+            summary_storage.save()
+            act.vote_value = 1
+            act.save()
+            print "add 1 note"
+
+        return JsonResponse({'voted': act.vote_value})
 
 
 # individual article display view
@@ -332,44 +380,6 @@ def feedback_submit(request):
         return JsonResponse({'message': 'Thank you!'})
 
 
-# =============== User register/login/logout (NOT IN USE!!) ===================
-class UserFormView(View):
-    form_class = UserForm
-    templates_name = 'motifapp/registration_form.html'
-
-    # display a blank form for new user
-    def get(self, request):
-        form = self.form_class(None)
-        return render(request, self.templates_name, {'form': form})
-
-    # process form data and register
-    def post(self, request):
-        form = self.form_class(request.POST)
-
-        if form.is_valid():
-            user = form.save(commit=False)
-            # cleaned (normalized) data
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-
-            # django built in way to set password
-            user.set_password(password)
-            user.save()
-
-            # create a profile after user successfully register
-            SocialProfile.objects.get_or_create(user=user)
-
-            # take user and pw, check db if they exist/active
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    return redirect('motifapp:index')
-
-        # if user didn't login, here is the form to try again
-        return render(request, self.templates_name, {'form': form})
-
-
 def register_user(request):
     print "user registration"
     if request.user.is_authenticated():
@@ -413,7 +423,7 @@ def register_user(request):
             if user is not None:
                 if user.is_active:
                     login(request, user)
-                    return redirect('motifapp:index')
+                    return redirect('motifapp:idea_of_motif')
 
     return render(request, 'motifapp/registration_form.html')
 
@@ -427,8 +437,12 @@ def everybody_is_friend(target_user):
     # for row in target_profile.followed_by.all():
     #     print "followed by", row.user
 
-    # get everybody but admin and itself
-    user_list = User.objects.exclude(username=target_user).exclude(username__icontains='admin')
+    # if it's testing account, only follows viviwill. Else get everybody but admin and itself
+    if 'testing' in target_user.username:
+        user_list = User.objects.filter(username='viviwill')
+    else:
+        user_list = User.objects.exclude(username=target_user).exclude(
+            username__icontains='admin').exclude(username__icontains='test')
 
     # everyone follows new kid and vice versa
     for row in user_list:
@@ -479,34 +493,128 @@ class UserProfile(generic.DetailView, FormMixin):
 
     def get_context_data(self, **kwargs):
         context = super(UserProfile, self).get_context_data(**kwargs)
+
+        current_path = self.request.path
+        if 'activity' in current_path:
+            context['current'] = 'activity'
+        elif 'profile' in current_path:
+            context['current'] = 'profile'
+        elif 'follower' in current_path:
+            context['current'] = 'follower'
+        elif 'following' in current_path:
+            context['current'] = 'following'
+
+        user = User.objects.get(username=self.kwargs['slug'])
+        if user == self.request.user:
+            context['is_login_user'] = True
+        else:
+            context['is_login_user'] = False
+
         context['form'] = ProfileForm(initial={'username': self.request.user})
+        if not self.request.user.socialprofile.follows.filter(user=user.id):
+            context['is_following'] = False
+        else:
+            context['is_following'] = True
+        print context['is_following']
+
+        context['number_of_rating'] = Article.objects.filter(storage__user=user,
+                                                             storage__rating_c__isnull=False).count()
+        context['number_of_summary'] = Article.objects.filter(storage__user=user,
+                                                              storage__summary__isnull=False).count()
+
+        # activity
+        # context['activities'] = Activity.objects.filter(user=user)
+        context['activities'] = Activity.objects.filter(
+            Q(user=user) | Q(storage_interact__user=user), ~Q(vote_value='0')).order_by(
+            '-activity_date')
+
         return context
 
     def post(self, request, *args, **kwargs):
-        # get the posted form, then validate
-        form = self.form_class(request.POST, request.FILES)
+        print "this is a post"
+        form = ProfileForm(self.request.POST, self.request.FILES)
+        slug = kwargs['slug']
 
         if form.is_valid():
-            user = form.save(commit=False)
+            print "Update user, form is valid"
+
+            # user = form.save(commit=False)
             # cleaned (normalized) data
             username = form.cleaned_data['username']
+            email = form.cleaned_data['email']
             old_password = form.cleaned_data['old_password']
             new_password = form.cleaned_data['new_password']
             portrait = form.cleaned_data['user_portrait']
-            portrait.name = str(self.request.user.id) + '.png'
+            # print "oldfilename is: ", portrait.name
+            # portrait.name = re.sub(r'.*\.', '.', portrait.name)
+            # print "new filename is: ", portrait.name
 
-            # if the file exist, delete
-            try:
-                path = 'images/portrait'
-                os.remove(os.path.join(settings.MEDIA_ROOT, path, portrait.name))
-            except OSError:
-                pass
+            # portrait.name = str(self.request.user.id) + '.png'
+            # print "username", username, "email", email, "old_password", old_password, "portrait", portrait
 
-            update_profile = SocialProfile.objects.get(user=self.request.user)
-            update_profile.user_portrait = portrait
-            update_profile.save()
+            if portrait:
+                print "there is something"
+            else:
+                print "no pic"
 
-        return render(request, self.template_name, {'form': form})
+            # update portrait if necessary
+            if portrait:
+                print "update portrait"
+                update_profile = SocialProfile.objects.get(user=request.user)
+                portrait.name = request.user.socialprofile.user_portrait.name
+                print "name is:", portrait.name
+
+                try:
+                    path = 'images/portrait'
+                    os.remove(os.path.join(settings.MEDIA_ROOT, path, portrait.name))
+                except OSError:
+                    pass
+                update_profile.user_portrait = portrait
+                update_profile.save()
+
+
+            # portrait.name = str(self.request.user.id) + '.png'
+            # # if the file exist, delete
+            # try:
+            #     path = 'images/portrait'
+            #     os.remove(os.path.join(settings.MEDIA_ROOT, path, portrait.name))
+            # except OSError:
+            #     pass
+            #
+            # update_profile = SocialProfile.objects.get(user=self.request.user)
+            # update_profile.user_portrait = portrait
+            # update_profile.save()
+
+
+
+            # update user info if necessary
+            if username != '' or new_password != '' or email != '':
+                print "update user info"
+                user_obj = authenticate(username=request.user, password=old_password)
+                if user_obj is not None:
+                    print "Password correct"
+
+                    if username != '':
+                        user_obj.username = username
+                        slug = username
+                    if new_password != '':
+                        user_obj.set_password(new_password)
+                    if email != '':
+                        user_obj.email = email
+                    user_obj.save()
+                    update_session_auth_hash(request, user_obj)
+                else:
+                    print "Password wrong"
+
+            return redirect('motifapp:user_profile', slug=slug)
+        return JsonResponse({'font_size': 'haha'})
+
+
+# idea view
+def idea_of_motif(request):
+    print "idea page here"
+
+    return render(request, 'motifapp/idea_of_motif.html')
 
 
 # testing view

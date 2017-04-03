@@ -2,7 +2,7 @@
 
 
 <!-- Modal -->
-<div id="myModal" class="modal fade" role="dialog">
+<div id="myModal" class="modal fade bd-example-modal-sm" role="dialog">
     <div class="modal-dialog">
         <!-- Modal content-->
         <div class="modal-content">
@@ -15,19 +15,21 @@
                           action="{% url 'motifapp:rating_edit' article.id %}"
                           enctype="multipart/form-data">
                         <div class="row">
-                            <div class="col-10">
-                                {% for i in "xxxxxxxxxx" %}
+                            <div class="col-2"></div>
+                            <div class="col-6">
+                                {% for i in "xxxxx" %}
                                 <input class="star creative-star"
-                                       id="creative-star-{{ 11|sub:forloop.counter }}" type="radio"
-                                       value={{ 11|sub:forloop.counter }} name="creative-star"/>
-                                <label class="star creative-star-{{ 11|sub:forloop.counter }}"
-                                       for="creative-star-{{ 11|sub:forloop.counter }}"></label>
+                                       id="creative-star-{{ 6|sub:forloop.counter }}" type="radio"
+                                       value={{ 6|sub:forloop.counter }} name="creative-star"/>
+                                <label class="star creative-star-{{ 6|sub:forloop.counter }}"
+                                       for="creative-star-{{ 6|sub:forloop.counter }}"></label>
                                 {% endfor %}
                             </div>
                             <div class="col-2">
                                 <button type="submit" class="btn btn-motif-1" style="margin-top:8px">
                                     rate</button>
                             </div>
+                            <div class="col-2"></div>
                         </div>
                     </form>
                 </div>

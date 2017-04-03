@@ -1,0 +1,17 @@
+{% extends 'motifapp/base.html' %}
+<!--{% load staticfiles %}-->
+{% load motifapp_extra %}
+{% block activity_view %}active{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h4> Activities </h4>
+    <p>
+        {% for act in activities %}
+        <li>{{ act.activity_date|naturaltime }}  // {{ act }}
+        <p>- {{ act.storage_interact.summary }}</p>
+        </li>
+        {% endfor %}
+    </p>
+</div>
+{% endblock %}

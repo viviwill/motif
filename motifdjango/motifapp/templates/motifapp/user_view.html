@@ -14,14 +14,14 @@
         <!-- article card starts here -->
         <div class="card-deck">
             {% for article in user_saved_article %}
-            <div class="col-sm-12 col-md-6 col-lg-4" style="padding: 0px 10px 0;">
+            <div class="col-xs-6 col-sm-6 col-md-6 col-lg-4" style="padding: 0px 10px 0;">
                 <div class="card">
                     <!-- article card image -->
                     <a href="{% url 'motifapp:article_read' article.id %}" class="article-thumb-link index-view-card">
                         {% if article.storage__summary %}
                             &nbsp
                         {% elif article.lead_image_url %}
-                            <div class="lead-image">
+                            <div class="pip free">
                                 <img class="card-img-top img-fluid" src="{{ article.lead_image_url }}">
                             </div>
                         {% endif %}
@@ -35,7 +35,7 @@
                                     {{article.storage__rating_c }}<span class="rating-note">/you</span>
                                 </div>
                                 <div class="article-thumb-corner-overall">
-                                    <i class="fa fa-lightbulb-o" aria-hidden="true"></i> {{ ratings|find_avg_c:article.id }}<span class="rating-note">/{{ ratings|find_number_of_rating:article.id }}</span>
+                                    <i class="fa fa-lightbulb-o" aria-hidden="true"></i> {{ ratings|find_avg_c:article.id }}<span class="rating-note">/5&nbsp&nbsp&nbsp&nbsp<i class="fa fa-user-o" aria-hidden="true"></i>{{ ratings|find_number_of_rating:article.id }}</span>
                                 </div>
                             </div>
                         </div>
@@ -52,7 +52,7 @@
                             <p>{{ article.body_content|truncatewords_html:60|safe }}</p>
                             {% endif %}
                             {% if article.storage__summary %}
-                            <p style="margin-top: 10px;"><span class="user-view-summary">&nbsp sum &nbsp</span>&nbsp{{ article.storage__summary }}</p>
+                            <p style="margin-top: 10px;"><span class="user-view-summary">&nbsp sum &nbsp</span>&nbsp{{ article.storage__summary|truncatewords:70 }}</p>
                             {% endif %}
                         </div>
                     </a>

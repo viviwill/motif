@@ -9,11 +9,13 @@ urlpatterns = [
 
     # register, login, logout
     url(r'^idea_of_motif/$', views.idea_of_motif, name='idea_of_motif'),
+    url(r'^activity/$', views.activity, name='activity'),
+    url(r'^upvote_summary/$', views.upvote_summary, name='upvote_summary'),
     url(r'^register/$', views.register_user, name='register'),
     url(r'^login/$', views.login_user, name='login'),
     url(r'^logout/$', views.logout_user, name='logout'),
+    # url(r'^update_profile/$', views.update_profile, name='update_profile'),
     url(r'^feedback_submit/$', views.feedback_submit, name='feedback_submit'),
-    url(r'^profile/(?P<slug>[\w.@+-]+)/$', views.UserProfile.as_view(), name='user_profile'),
 
     # add article
     url(r'^article_add/$', views.article_add, name='article_add'),
@@ -30,7 +32,11 @@ urlpatterns = [
 
 
     # user article list view
-    url(r'^(?P<slug>[\w.@+-]+)/$', views.UserView.as_view(), name='user_view'),
+    url(r'^user/(?P<slug>[\w.@+-]+)/saved/$', views.UserView.as_view(), name='user_view'),
+    url(r'^user/(?P<slug>[\w.@+-]+)/profile/$', views.UserProfile.as_view(), name='user_profile'),
+    url(r'^user/(?P<slug>[\w.@+-]+)/activity/$', views.UserProfile.as_view(), name='user_activity'),
+    url(r'^user/(?P<slug>[\w.@+-]+)/following/$', views.UserProfile.as_view(), name='user_following'),
+    url(r'^user/(?P<slug>[\w.@+-]+)/follower/$', views.UserProfile.as_view(), name='user_follower'),
 
     # testing page
     url(r'^testing/testing/$', views.testing_view, name='testing_view'),

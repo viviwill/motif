@@ -1,0 +1,21 @@
+{% load motifapp_extra %}
+
+<div class="card" style="background-color:transparent; border:none; width:100%;">
+{% for act in activities %}
+    <div class="card-block" style="padding: 0.5rem;">
+        <div class="row">
+            <div class="col-1" style="padding:0px;">
+                <small>{{ act.activity_date|naturaltime }}</small>
+            </div>
+            <div class="col-10">
+                <p style="margin-bottom: 0.2rem;">
+                    {{act.get_type_display|title }}
+                    <a href="{% url 'motifapp:user_view' act.storage_interact.user %}">{{act.storage_interact.user}}'s</a> summary:
+                    <a href="{% url 'motifapp:article_read' act.storage_interact.article.id %}">{{act.storage_interact.article.title|truncatewords:7}}</a>
+                </p>
+                <p style="margin-bottom: 0.2rem;">{{ act.storage_interact.summary }}</p>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+</div>

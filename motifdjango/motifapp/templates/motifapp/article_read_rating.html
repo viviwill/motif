@@ -2,14 +2,16 @@
 
 <div class="row" id="article-read-rating">
     <div class="overall-rating col-6">
-        <div class="Overall">{{ ratings|find_avg_c:article.id }}<span class="rating-note">/{{ ratings|find_number_of_rating:article.id }}</span></div>
+        <div class="Overall">{{ ratings|find_avg_c:article.id }}<span class="rating-note">/5&nbsp&nbsp&nbsp&nbsp<i class="fa fa-user-o" aria-hidden="true"></i>{{ ratings|find_number_of_rating:article.id }}</span></div>
     </div>
     <div class="user-rating col-6">
         <!-- rating submission -->
         <a href="#" class="" data-toggle="modal" data-target="#myModal">
             <div class="edit-rating-wrapper">
                 {% if storage_entry.rating_c %}
-                <div class="creative-rating"> {{ storage_entry.rating_c }}</div>
+                <div class="creative-rating">{{ storage_entry.rating_c }}<span class="rating-note">/5</span>
+
+                </div>
                 {% else %}
                 <div class="creative-rating">Rate It</div>
                 {% endif %}

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import User
+from django.template.defaultfilters import truncatechars
 from django.utils.encoding import python_2_unicode_compatible
 
 
@@ -33,15 +34,47 @@ class Storage(models.Model):
     # 2 ratings: creative and informative
     rating_c = models.FloatField(blank=True, null=True)
     rating_i = models.FloatField(blank=True, null=True)
-    summary = models.CharField(max_length=1500, blank=True, null=True)
+    summary = models.TextField(blank=True, null=True)
 
     summary_modified_date = models.DateTimeField('summary modified', blank=True, null=True)
     ratings_modified_date = models.DateTimeField('ratings modified', blank=True, null=True)
     public = models.BooleanField(default=True)
 
-    def __str__(self):
-        return '%s' % (self.article)
+    # new since here
+    upvotes = models.IntegerField(default=0)
+    downvotes = models.IntegerField(default=0)
 
+    def __str__(self):
+        return '%s: %s by %s' % (self.id, self.article.title, self.user)
+
+    @property
+    def short_summary(self):
+        return truncatechars(self.summary, 30)
+
+@python_2_unicode_compatible
+class Activity(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    storage_interact = models.ForeignKey(Storage, on_delete=models.CASCADE)
+    activity_date = models.DateTimeField(blank=True, null=True)
+    vote_value = models.IntegerField(default=0)
+    TYPE_CHOICES = (
+        ('ADD', 'adds'),
+        ('SAVE', 'saves'),
+        ('UP', 'upvotes'),
+        ('DOWN', 'downvotes'),
+    )
+    type = models.CharField(
+        max_length=10,
+        choices=TYPE_CHOICES,
+        default=None,
+    )
+
+    def __str__(self):
+        return '%s %s summary left by %s on %s' % \
+               (self.user.username,
+                self.get_type_display(),
+                self.storage_interact.user,
+                self.storage_interact.article.title)
 
 
 

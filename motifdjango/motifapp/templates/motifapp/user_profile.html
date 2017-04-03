@@ -1,53 +1,40 @@
 {% extends 'motifapp/base.html' %}
-
+{% load staticfiles %}
+{% load motifapp_extra %}
 
 {% block body %}
     <div class="container">
-        <div class="row">
-            <div class="col-12" style="border-bottom: 2px solid lightgray; padding: 15px; margin-bottom: 20px">
-                <div class="row">
-                    <div class="col-2">
-                        <img class ="profile-portrait rounded-circle" src="{{MEDIA_URL}}{{ user.socialprofile.user_portrait }}" class="user-portrait-lg">
-                    </div>
-                    <div class="col-10">
-                        <h1>{{ user }}</h1>
-                        <h4> {{ user.storage_set.all.count }} Articles Saved </h4>
-                        <h4> {{ user.storage_set.rating.all.count }} Ratings </h4>
-                        <h4> {{ user.storage_set.summary.all.count }} Summaries </h4>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include "motifapp/user_view_profile.html" %}
+
         <div class="row">
             <div class="col-2" style="border-right: 2px solid lightgray;">
                 <ul class="nav nav-pills flex-column">
-                    <li class="nav-item">
-                        <a href="#" class="nav-link"> Profile </a>
+                    <li class="nav-item {% if current == 'profile' %}active{% endif %}">
+                        <a href="{% url 'motifapp:user_profile' user  %}" class="nav-link"> Profile</a>
                     </li>
-                </ul>
-                <ul class="nav nav-pills flex-column">
-                    <li class="nav-item">
-                        <a href="#" class="nav-link"> Followings </a>
+                    <li class="nav-item {% if current == 'activity' %}active{% endif %}">
+                        <a href="{% url 'motifapp:user_activity' user  %}" class="nav-link"> Activity </a>
                     </li>
-                </ul>
-                <ul class="nav nav-pills flex-column">
-                    <li class="nav-item">
-                        <a href="#" class="nav-link"> Followers </a>
+                    <li class="nav-item {% if current == 'following' %}active{% endif %}">
+                        <a href="{% url 'motifapp:user_following' user  %}" class="nav-link"> Followings </a>
+                    </li>
+                    <li class="nav-item {% if current == 'follower' %}active{% endif %}">
+                        <a href="{% url 'motifapp:user_follower' user %}" class="nav-link"> Followers </a>
                     </li>
                 </ul>
             </div>
 
-            <div class="col-9" style="padding-left: 50px;">
-                <p> WIP, can only upload portrait right now ... </p>
-                <form class="form-horizontal" role="form" action="" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {% include 'motifapp/form_template.html' %}
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <button type="submit" class="btn btn-success">Submit</button>
-                        </div>
-                    </div>
-                </form>
+            <div class="col-10" style="padding-left: 50px;">
+                <h4> {{ current|upper }}</h4>
+                {% if current == 'profile' %}
+                    {% include "motifapp/user_profile_profile.html" %}
+                {% elif current == 'activity' %}
+                    {% include "motifapp/user_profile_activity.html" %}
+                {% elif current == 'following' %}
+                    {% include "motifapp/user_profile_activity.html" %}
+                {% elif current == 'follower' %}
+                    {% include "motifapp/user_profile_activity.html" %}
+                {% endif %}
             </div>
         </div>
     </div>
@@ -63,16 +50,3 @@
         </div>
     </div>
 </form>
-
-
-
-<div class="col-md-6" style="border-bottom: 2px solid dimgray">
-    <h2> {{ user.socialprofile.follows.all.count }} Following</h2>
-</div>
-<div class="col-md-6" style="border-bottom: 2px solid dimgray">
-    <h2>{{ user.socialprofile.followed_by.all.count }} Followers</h2>
-</div>
-
-<!--{% for user in user.socialprofile.follows.all %}-->
-<!--<p>{{ user.user.username }}</p>-->
-<!--{% endfor %}-->

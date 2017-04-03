@@ -21,7 +21,8 @@ class ArticleAdmin(admin.ModelAdmin):
 
 
 class StorageAdmin(admin.ModelAdmin):
-    list_display = ('user', 'article', 'public', 'add_date', "rating_c", 'summary')
+    list_display = ('id', 'upvotes', 'user', 'article',
+                    'public', 'add_date', "rating_c", 'short_summary')
 
 
 class SocialprofileAdmin(admin.ModelAdmin):
@@ -36,9 +37,14 @@ class FeedbackAdmin(admin.ModelAdmin):
     list_display = ('user', 'url', 'message')
 
 
+class ActivityAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'type', 'vote_value', 'activity_date')
+
+
 # Models that listed in admin
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Storage, StorageAdmin)
 admin.site.register(SocialProfile, SocialprofileAdmin)
 admin.site.register(Invite, InviteAdmin)
 admin.site.register(Feedback, FeedbackAdmin)
+admin.site.register(Activity, ActivityAdmin)

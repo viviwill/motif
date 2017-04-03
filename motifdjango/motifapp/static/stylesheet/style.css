@@ -551,7 +551,14 @@ label.star:before {
     -webkit-column-gap:1em;
 }
 
+.discover-card-top-image-wrap {
+    max-height: 250px;
+    overflow: hidden;
+}
 
+.discover-card-top-image-wrap img {
+    width: 100%;
+}
 
 .card-detail {
     width: 100%;
@@ -560,7 +567,7 @@ label.star:before {
 
 .discover-summary {
     border-top: 1px solid lightgrey;
-    padding-top: 3px;
+    padding-top: 10px;
 }
 
 .discover-thumb-author-info {

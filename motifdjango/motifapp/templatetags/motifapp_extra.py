@@ -9,6 +9,15 @@ register = template.Library()
 
 
 @register.filter
+def find_user_summary_vote(value, arg):
+    try:
+        list(value).index(arg)
+        return True
+    except ValueError:
+        return False
+
+
+@register.filter
 def find_number_of_rating(value, arg):
     try:
         index = [art.id for art in value].index(arg)

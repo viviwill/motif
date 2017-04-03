@@ -299,5 +299,36 @@ $(function(){
     });
 
 
+    //upvote
+    $('.upvote-button').on("click", '.btn', function(e) {
+        e.preventDefault();
+        var element = $(this)
+        var storage_id = element.attr('value');
+        var vote_count = parseInt(element.children(' span').html());
+        console.log('vote_count',vote_count);
+        $.ajax({
+            type: 'POST',
+            url: "/upvote_summary/",
+            data: {
+                storage_id: storage_id,
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            },
+            success: function (response) {
+                console.log("upvote summary on:", storage_id)
+                var voted = response['voted']
+                // console.log("Voted: ", response['voted'])
+                if (voted == 1 ) {
+                    element.toggleClass("btn-secondary btn-motif-1");
+                    element.children(' span').html(vote_count+1);
+                }
+                else {
+                    element.toggleClass("btn-motif-1 btn-secondary");
+                    element.children(' span').html(vote_count-1);
+                }
+            }
+        });
+    });
+
+
 //end
 });

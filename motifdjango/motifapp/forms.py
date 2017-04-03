@@ -18,10 +18,12 @@ class SummaryAddForm(forms.ModelForm):
 
 
 class ProfileForm(forms.ModelForm):
-    username = forms.CharField()
-    old_password = forms.CharField(widget=forms.PasswordInput)
-    new_password = forms.CharField(widget=forms.PasswordInput)
+    username = forms.CharField(required=False)
+    email = forms.CharField(required=False)
+    old_password = forms.CharField(required=False, widget=forms.PasswordInput)
+    new_password = forms.CharField(required=False, widget=forms.PasswordInput)
+    user_portrait = forms.ImageField(required=False)
 
     class Meta:
         model = SocialProfile
-        fields = ['username', 'old_password', 'new_password', 'user_portrait']
+        fields = ['username', 'email', 'old_password', 'new_password', 'user_portrait']
