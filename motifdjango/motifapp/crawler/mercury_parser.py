@@ -40,9 +40,16 @@ class Crawler(object):
             pass
         except KeyError:
             pass
+        except ValueError:
+            pass
 
         self.add_date = datetime.now().replace(microsecond=0)
-        self.word_count = article['word_count']
+
+        try:
+            self.word_count = article['word_count']
+        except KeyError:
+            self.word_count = None
+
         self.domain = article['domain']
         self.lead_image_url = article['lead_image_url']
 
@@ -123,6 +130,7 @@ class Crawler(object):
 
     def print_article_info(self):
         print "Title:", self.title
+        print "Domain", self.domain
         print "By: ", self.author
         print "From:", self.web_url
         print "Pub on:", self.pub_date

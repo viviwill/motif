@@ -1,7 +1,7 @@
 from motif_crawler import *
 
 
-url = 'http://www.businessinsider.com/benefits-of-eating-banana-peels-2015-9'
+url = 'http://www.newyorker.com/magazine/2017/04/10/march-madness-in-the-meatpacking-district'
 content = Uploadarticle(url).print_info()
 
 
