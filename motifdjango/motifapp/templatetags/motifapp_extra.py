@@ -25,6 +25,7 @@ def find_number_of_rating(value, arg):
     except ValueError:
         return None
 
+
 @register.filter
 # {{ ratings|find_avg_c:article.id }}
 def find_avg_c(value, arg):

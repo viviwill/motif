@@ -4,7 +4,9 @@
 
 {% block body %}
 <div class="container">
-    {{ variable }}
+    {% for row in variable %}
+    <p>{{ row.id }} / {{ row.title }} / {{ row.storage__summary }}</p>
+    {% endfor %}
     <div class="summary-editable">
         <div id="summernote"></div>
     </div>

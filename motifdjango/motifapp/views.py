@@ -7,8 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Count, Avg
-from django.db.models import Q
+from django.db.models import Count, AvgQ
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
@@ -462,6 +461,7 @@ def login_user(request):
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
+        print username, password
         if user is not None:
             if user.is_active:
                 login(request, user)
@@ -494,6 +494,7 @@ class UserProfile(generic.DetailView, FormMixin):
     def get_context_data(self, **kwargs):
         context = super(UserProfile, self).get_context_data(**kwargs)
 
+        # stage the current viewing
         current_path = self.request.path
         if 'activity' in current_path:
             context['current'] = 'activity'
@@ -619,5 +620,15 @@ def idea_of_motif(request):
 
 # testing view
 def testing_view(request):
-    variable = request.path
-    return render(request, 'motifapp/zzz_testing.html', {'variable': variable})
+    # variable = request.path
+    # followings = user.socialprofile.follows.all()
+    # followings_list = list(followings.values_list('user', flat=True).order_by('user'))
+    #
+    # # get all public articles saved by follows
+    # public_saved = Article.objects.filter(
+    #     storage__user__in=followings_list).filter(storage__public=True)
+
+    search = "is"
+    variable = Article.objects.filter(Q(storage__summary__icontains=search))
+    result = variable.values('id', 'title', 'storage__summary')
+    return render(request, 'motifapp/zzz_testing.html', {'variable': result})
